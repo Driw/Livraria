@@ -1,10 +1,11 @@
+
 package com.livraria.model;
 
 import java.util.Date;
 
-import com.livraria.controle.LivroAutores;
-
-public class Livro {
+public class Livro
+{
+	private int id;
 	private String isbn;
 	private int categoria;
 	private String titulo;
@@ -13,54 +14,95 @@ public class Livro {
 	private Editora editora;
 	private Autor autor;
 	private LivroAutores livrosPorAutor;
-	
-	public String getIsbn() {
+
+	public int getID()
+	{
+		return id;
+	}
+
+	public void setID(int id)
+	{
+		this.id = id;
+	}
+
+	public String getIsbn()
+	{
 		return isbn;
 	}
-	public void setIsbn(String isbn) {
+
+	public void setIsbn(String isbn)
+	{
 		this.isbn = isbn;
 	}
-	public int getCategoria() {
+
+	public int getCategoria()
+	{
 		return categoria;
 	}
-	public void setCategoria(int categoria) {
+
+	public void setCategoria(int categoria)
+	{
 		this.categoria = categoria;
 	}
-	public String getTitulo() {
+
+	public String getTitulo()
+	{
 		return titulo;
 	}
-	public void setTitulo(String titulo) {
+
+	public void setTitulo(String titulo)
+	{
 		this.titulo = titulo;
 	}
-	public float getPreco() {
+
+	public float getPreco()
+	{
 		return preco;
 	}
-	public void setPreco(float preco) {
+
+	public void setPreco(float preco)
+	{
 		this.preco = preco;
 	}
-	public Date getPublicacao() {
+
+	public Date getPublicacao()
+	{
 		return publicacao;
 	}
-	public void setPublicacao(Date publicacao) {
+
+	public void setPublicacao(Date publicacao)
+	{
 		this.publicacao = publicacao;
 	}
-	public Editora getEditora() {
+
+	public Editora getEditora()
+	{
 		return editora;
 	}
-	public void setEditora(Editora editora) {
+
+	public void setEditora(Editora editora)
+	{
 		this.editora = editora;
 	}
-	public Autor getAutor() {
+
+	public Autor getAutor()
+	{
 		return autor;
 	}
-	public void setAutor(Autor autor) {
+
+	public void setAutor(Autor autor)
+	{
 		this.autor = autor;
 	}
-	public LivroAutores getLivrosPorAutor() {
+
+	public LivroAutores getLivrosPorAutor()
+	{
 		return livrosPorAutor;
 	}
-	public void setLivrosPorAutor(LivroAutores livrosPorAutor) {
+
+	public void setLivrosPorAutor(LivroAutores livrosPorAutor)
+	{
 		this.livrosPorAutor = livrosPorAutor;
 	}
-	
+
 }

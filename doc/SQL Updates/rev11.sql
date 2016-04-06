@@ -1,0 +1,1 @@
+ALTER TABLE livros ADD COLUMN desconto FLOAT AFTER preco;

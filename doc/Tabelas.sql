@@ -7,6 +7,7 @@ CREATE TABLE livros
 	titulo VARCHAR(48),
 	editora INT,
 	preco FLOAT,
+	desconto FLOAT,
 	publicacao DATE,
 
 	PRIMARY KEY (id),

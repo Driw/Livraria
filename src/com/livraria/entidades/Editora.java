@@ -1,5 +1,5 @@
 
-package com.livraria.model;
+package com.livraria.entidades;
 
 public class Editora
 {

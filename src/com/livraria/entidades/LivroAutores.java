@@ -1,5 +1,5 @@
 
-package com.livraria.model;
+package com.livraria.entidades;
 
 import org.diverproject.util.collection.List;
 import org.diverproject.util.collection.abstraction.DynamicList;

@@ -1,5 +1,5 @@
 
-package com.livraria.model;
+package com.livraria.entidades;
 
 import java.util.Date;
 
@@ -10,10 +10,10 @@ public class Livro
 	private int categoria;
 	private String titulo;
 	private float preco;
+	private float desconto;
 	private Date publicacao;
 	private Editora editora;
-	private Autor autor;
-	private LivroAutores livrosPorAutor;
+	private LivroAutores autores;
 
 	public int getID()
 	{
@@ -65,6 +65,16 @@ public class Livro
 		this.preco = preco;
 	}
 
+	public float getDesconto()
+	{
+		return desconto;
+	}
+
+	public void setDesconto(float desconto)
+	{
+		this.desconto = desconto;
+	}
+
 	public Date getPublicacao()
 	{
 		return publicacao;
@@ -85,24 +95,8 @@ public class Livro
 		this.editora = editora;
 	}
 
-	public Autor getAutor()
+	public LivroAutores getLivroAutores()
 	{
-		return autor;
+		return autores == null ? (autores = new LivroAutores(this)) : autores;
 	}
-
-	public void setAutor(Autor autor)
-	{
-		this.autor = autor;
-	}
-
-	public LivroAutores getLivrosPorAutor()
-	{
-		return livrosPorAutor;
-	}
-
-	public void setLivrosPorAutor(LivroAutores livrosPorAutor)
-	{
-		this.livrosPorAutor = livrosPorAutor;
-	}
-
 }

@@ -11,128 +11,92 @@ import java.util.List;
 import org.diverproject.util.sql.MySQL;
 
 import com.livraria.Conexao;
-import com.livraria.model.Editora;
+import com.livraria.entidades.Editora;
 
 public class ControleEditora
 {
-	
-	private static final MySQL mysql;
-	private static Conexao conexao;
-	private static final Connection c;
+	private static final Connection connection;
 	
 	static
 	{
-		mysql = conexao.getMySQL();
-		c = mysql.getConnection();
+		MySQL mysql = Conexao.getMySQL();
+		connection = mysql.getConnection();
 	}
 	
-	public boolean adicionar(Editora e)
+	public boolean adicionar(Editora editora) throws SQLException
 	{
-		boolean validar = false;
-		try
-		{
-			String sql = "INSERT INTO editoras values (?, ?, ?, ?)";
-			PreparedStatement ps = c.prepareStatement(sql);
-			ps.setString(1, e.getCnpj());
-			ps.setString(2, e.getNome());
-			ps.setString(3, e.getEndereco());
-			ps.setString(4, e.getTelefone());
-			validar = ps.execute();
-		}
-		catch (SQLException e1)
-		{
-			e1.printStackTrace();
-		}
-		return validar;
+		String sql = "INSERT INTO editoras (cnpj, nome, endereco, telefone) values (?, ?, ?, ?)";
+
+		PreparedStatement ps = connection.prepareStatement(sql);
+		ps.setString(1, editora.getCnpj());
+		ps.setString(2, editora.getNome());
+		ps.setString(3, editora.getEndereco());
+		ps.setString(4, editora.getTelefone());
+
+		return ps.execute();
 	}
 
-	public boolean atualizar(Editora e)
+	public boolean atualizar(Editora editora) throws SQLException
 	{
-		boolean validar = false;
-		try
-		{
-			String sql = "UPDATE editoras SET cnpj = ?, nome = ?, endereco = ?, "
+		String sql = "UPDATE editoras SET cnpj = ?, nome = ?, endereco = ?, "
 					+ "telefone = ? WHERE id = ?";
-			PreparedStatement ps = c.prepareStatement(sql);
-			ps.setString(1, e.getCnpj());
-			ps.setString(2, e.getNome());
-			ps.setString(3, e.getEndereco());
-			ps.setString(4, e.getTelefone());
-			ps.setInt(5, e.getID());
-			validar = ps.execute();
-		}
-		catch (SQLException e1)
-		{
-			e1.printStackTrace();
-		}
-		return validar;
+
+		PreparedStatement ps = connection.prepareStatement(sql);
+		ps.setString(1, editora.getCnpj());
+		ps.setString(2, editora.getNome());
+		ps.setString(3, editora.getEndereco());
+		ps.setString(4, editora.getTelefone());
+		ps.setInt(5, editora.getID());
+
+		return ps.executeUpdate() != PreparedStatement.EXECUTE_FAILED;
 	}
 
-	public boolean excluir(int id)
+	public boolean excluir(int id) throws SQLException
 	{
-		boolean validar = false;
-		try
-		{
-			String sql = "DELETE FROM editoras WHERE id = ?";
-			PreparedStatement ps = c.prepareStatement(sql);
-			ps.setInt(1, id);
-			validar = ps.execute();
-		}
-		catch (SQLException e1)
-		{
-			e1.printStackTrace();
-		}
-		return validar;
+		String sql = "DELETE FROM editoras WHERE id = ?";
+		PreparedStatement ps = connection.prepareStatement(sql);
+		ps.setInt(1, id);
+
+		return ps.executeUpdate() != PreparedStatement.EXECUTE_FAILED;
 	}
 
-	public Editora selecionar(int id)
+	public Editora selecionar(int id) throws SQLException
 	{
 		Editora editora = new Editora();
-		try
+
+		String sql = "SELECT * FROM editoras WHERE id = ?";
+		PreparedStatement ps = connection.prepareStatement(sql);
+		ps.setInt(1, id);
+		ResultSet rs = ps.executeQuery();
+
+		editora.setID(id);
+		editora.setCnpj(rs.getString("cnpj"));
+		editora.setNome(rs.getString("nome"));
+		editora.setEndereco(rs.getString("enredeco"));
+		editora.setTelefone(rs.getString("telefone"));
+
+		return editora;
+	}
+
+	public List<Editora> listar() throws SQLException
+	{
+		List<Editora> editoras = new ArrayList<Editora>();
+
+		String sql = "SELECT * FROM editoras";
+		PreparedStatement ps = connection.prepareStatement(sql);
+		ResultSet rs = ps.executeQuery();
+
+		while (rs.next())
 		{
-			String sql = "SELECT * FROM editoras WHERE id = ?";
-			PreparedStatement ps = c.prepareStatement(sql);
-			ps.setInt(1, id);
-			ResultSet rs = ps.executeQuery();
-			
-			editora.setID(id);
+			Editora editora = new Editora();
+			editora.setID(rs.getInt("id"));
 			editora.setCnpj(rs.getString("cnpj"));
 			editora.setNome(rs.getString("nome"));
 			editora.setEndereco(rs.getString("enredeco"));
 			editora.setTelefone(rs.getString("telefone"));
+			editoras.add(editora);
 		}
-		catch (SQLException e1)
-		{
-			e1.printStackTrace();
-		}
-		return editora;
-	}
 
-	public List<Editora> listar()
-	{
-		List<Editora> editoras = new ArrayList<Editora>();
-		
-		try
-		{
-			String sql = "SELECT * FROM editoras";
-			PreparedStatement ps = c.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery();
-			while (rs.next())
-			{
-				Editora editora = new Editora();
-				editora.setID(rs.getInt("id"));
-				editora.setCnpj(rs.getString("cnpj"));
-				editora.setNome(rs.getString("nome"));
-				editora.setEndereco(rs.getString("enredeco"));
-				editora.setTelefone(rs.getString("telefone"));
-				editoras.add(editora);
-			}
-			
-		}
-		catch (SQLException e1)
-		{
-			e1.printStackTrace();
-		}
 		return editoras;
 	}
 }

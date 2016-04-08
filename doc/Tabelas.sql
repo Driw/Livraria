@@ -1,19 +1,43 @@
 
+CREATE TABLE cdus
+(
+	id INT NOT NULL AUTO_INCREMENT,
+	codigo VARCHAR(9) NOT NULL,
+	tema VARCHAR(200) NOT NULL,
+
+	UNIQUE (codigo),
+	PRIMARY KEY(id)
+);
+
 CREATE TABLE livros
 (
 	id INT AUTO_INCREMENT,
 	isbn CHAR(13),
-	categoria INT,
 	titulo VARCHAR(48),
 	editora INT,
 	preco FLOAT,
-	desconto FLOAT,
 	publicacao DATE,
+	paginas INT,
+	capa INT,
+	resumo VARCHAR(4096),
+	sumario VARCHAR(1024),
+	preco_custo FLOAT,
+	margem_lucro FLOAT,
 
 	PRIMARY KEY (id),
 	UNIQUE (isbn),
 	FOREIGN KEY (editora) REFERENCES editoras (id)
 );
+
+CREATE TABLE livros_categorias
+(
+	livro INT,
+	cdu INT,
+
+	PRIMARY KEY (livro, cdu),
+	FOREIGN KEY (livro) REFERENCES livros (id),
+	FOREIGN KEY (cdu) REFERENCES cdus (id)
+)
 
 CREATE TABLE editoras
 (
@@ -33,7 +57,7 @@ CREATE TABLE autores
 	nome VARCHAR(48),
 	nascimento DATE,
 	falecimento DATE,
-	localMorte VARCHAR(32),
+	local_morte VARCHAR(32),
 	biografia VARCHAR(512),
 
 	PRIMARY KEY (id)

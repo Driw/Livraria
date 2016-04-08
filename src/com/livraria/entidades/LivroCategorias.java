@@ -31,13 +31,9 @@ public class LivroCategorias
 		return categorias.remove(categoria);
 	}
 
-	public Categoria obter(int categoriaID)
+	public Categoria obter(int indice)
 	{
-		for (Categoria autor : categorias)
-			if (autor.getID() == categoriaID)
-				return autor;
-
-		return null;
+		return categorias.get(indice);
 	}
 
 	public Categoria[] listar()

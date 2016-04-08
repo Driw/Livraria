@@ -68,11 +68,11 @@ public class Fronteira
 	private void usarContainer(Container container)
 	{
 		frame.setContentPane(container);
+		frame.setSize(container.getWidth() + 8, container.getHeight() + 32);
 
 		if (container instanceof IFronteira)
 		{
 			IFronteira fronteira = (IFronteira) container;
-			frame.setSize(fronteira.getWidth(), fronteira.getHeight() + 24);
 			frame.setLocationRelativeTo(null);
 			frame.setTitle(fronteira.getTitle());
 		}

@@ -51,7 +51,6 @@ public class FronteiraManterEditoras extends Container implements IFronteira
 		panelDados.add(lblNome);
 
 		tfNome = new JTextField();
-		tfNome.setColumns(10);
 		tfNome.setBounds(170, 43, 480, 25);
 		panelDados.add(tfNome);
 
@@ -144,7 +143,6 @@ public class FronteiraManterEditoras extends Container implements IFronteira
 		panelConsulta.add(lblFiltro);
 		
 		tfFiltro = new JTextField();
-		tfFiltro.setColumns(10);
 		tfFiltro.setBounds(100, 22, 395, 25);
 		panelConsulta.add(tfFiltro);
 		

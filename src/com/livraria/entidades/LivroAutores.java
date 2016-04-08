@@ -31,13 +31,9 @@ public class LivroAutores
 		return autores.remove(autor);
 	}
 
-	public Autor obter(int autorID)
+	public Autor obter(int indice)
 	{
-		for (Autor autor : autores)
-			if (autor.getID() == autorID)
-				return autor;
-
-		return null;
+		return autores.get(indice);
 	}
 
 	public Autor[] listar()

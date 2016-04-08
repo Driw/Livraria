@@ -52,7 +52,6 @@ public class FronteiraManterAutores extends Container implements IFronteira
 		panelDados.add(lblNome);
 
 		tfNome = new JTextField();
-		tfNome.setColumns(10);
 		tfNome.setBounds(170, 19, 479, 25);
 		panelDados.add(tfNome);
 
@@ -63,7 +62,6 @@ public class FronteiraManterAutores extends Container implements IFronteira
 		panelDados.add(lblDataDeNascimento);
 
 		tfDataNascimento = new JTextField();
-		tfDataNascimento.setColumns(10);
 		tfDataNascimento.setBounds(170, 55, 140, 25);
 		panelDados.add(tfDataNascimento);
 
@@ -74,7 +72,6 @@ public class FronteiraManterAutores extends Container implements IFronteira
 		panelDados.add(lblDataDeFalecimento);
 
 		tfDataFalecimento = new JTextField();
-		tfDataFalecimento.setColumns(10);
 		tfDataFalecimento.setBounds(509, 55, 140, 25);
 		panelDados.add(tfDataFalecimento);
 
@@ -85,7 +82,6 @@ public class FronteiraManterAutores extends Container implements IFronteira
 		panelDados.add(lblLocalDaMorte);
 
 		tfLocalMorte = new JTextField();
-		tfLocalMorte.setColumns(10);
 		tfLocalMorte.setBounds(170, 92, 479, 25);
 		panelDados.add(tfLocalMorte);
 
@@ -96,7 +92,6 @@ public class FronteiraManterAutores extends Container implements IFronteira
 		panelDados.add(lblBiografia);
 
 		tfBiografia = new JTextField();
-		tfBiografia.setColumns(10);
 		tfBiografia.setBounds(170, 127, 479, 113);
 		panelDados.add(tfBiografia);
 
@@ -139,7 +134,6 @@ public class FronteiraManterAutores extends Container implements IFronteira
 		panelConsulta.add(lblFiltro);
 
 		tfFiltro = new JTextField();
-		tfFiltro.setColumns(10);
 		tfFiltro.setBounds(100, 22, 394, 25);
 		panelConsulta.add(tfFiltro);
 

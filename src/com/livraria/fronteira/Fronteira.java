@@ -14,7 +14,9 @@ import com.livraria.JanelaListener;
 public class Fronteira
 {
 	private static final Fronteira INSTANCIA = new Fronteira();
-	private static final Font FONT = new Font("verdana", Font.PLAIN, 12);
+	public static final Font FONT = new Font("verdana", Font.PLAIN, 12);
+	public static final Font FONT_TITULO = new Font("Tahoma", Font.PLAIN, 16);
+	public static final Font FONT_COMPONENTES = new Font("Tahoma", Font.PLAIN, 12);
 
 	private JFrame frame;
 
@@ -59,13 +61,23 @@ public class Fronteira
 			if (component instanceof Container)
 				prepararContainer((Container) component);
 
-		container.setFont(FONT);
+		if (container.getFont() == null)
+			container.setFont(FONT);
 	}
 
 	private void usarContainer(Container container)
 	{
 		frame.setContentPane(container);
-		frame.setSize(container.getWidth() + 16, container.getHeight() + 38);
+
+		if (container instanceof IFronteira)
+		{
+			IFronteira fronteira = (IFronteira) container;
+			frame.setSize(fronteira.getWidth(), fronteira.getHeight() + 24);
+			frame.setLocationRelativeTo(null);
+			frame.setTitle(fronteira.getTitle());
+		}
+
+		frame.repaint();
 	}
 
 	public void mostrar()

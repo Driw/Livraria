@@ -99,4 +99,58 @@ public class ControleEditora
 
 		return editoras;
 	}
+
+	public List<Editora> filtrarPorCNPJ(String cnpj) throws SQLException
+	{
+		String sql = "SELECT * FROM editoras WHERE cnpj LIKE '?%'";
+
+		PreparedStatement ps = connection.prepareStatement(sql);
+		ps.setString(1, cnpj);
+
+		ResultSet rs = ps.executeQuery();
+
+		return concluirFiltragem(rs);
+	}
+
+	public List<Editora> filtrarPorNome(String nome) throws SQLException
+	{
+		String sql = "SELECT * FROM editoras WHERE nome = '%?%'";
+
+		PreparedStatement ps = connection.prepareStatement(sql);
+		ps.setString(1, nome);
+
+		ResultSet rs = ps.executeQuery();
+
+		return concluirFiltragem(rs);
+	}
+
+	public List<Editora> filtrarPorTelefone(String telefone) throws SQLException
+	{
+		String sql = "SELECT * FROM editoras WHERE telefone LIKE '?%'";
+
+		PreparedStatement ps = connection.prepareStatement(sql);
+		ps.setString(1, telefone);
+
+		ResultSet rs = ps.executeQuery();
+
+		return concluirFiltragem(rs);
+	}
+
+	public List<Editora> concluirFiltragem(ResultSet rs) throws SQLException
+	{
+		List<Editora> editoras = new ArrayList<Editora>();
+
+		while (rs.next())
+		{
+			Editora editora = new Editora();
+			editora.setID(rs.getInt("id"));
+			editora.setCnpj(rs.getString("cnpj"));
+			editora.setNome(rs.getString("nome"));
+			editora.setEndereco(rs.getString("enredeco"));
+			editora.setTelefone(rs.getString("telefone"));
+			editoras.add(editora);
+		}
+
+		return editoras;
+	}
 }

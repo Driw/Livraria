@@ -7,13 +7,18 @@ public class Livro
 {
 	private int id;
 	private String isbn;
-	private int categoria;
 	private String titulo;
 	private float preco;
-	private float desconto;
 	private Date publicacao;
+	private int paginas;
+	private int capa;
+	private String resumo;
+	private String sumario;
+	private float precoCusto;
+	private float margemLucro;
 	private Editora editora;
 	private LivroAutores autores;
+	private LivroCategorias categorias;
 
 	public int getID()
 	{
@@ -33,16 +38,6 @@ public class Livro
 	public void setIsbn(String isbn)
 	{
 		this.isbn = isbn;
-	}
-
-	public int getCategoria()
-	{
-		return categoria;
-	}
-
-	public void setCategoria(int categoria)
-	{
-		this.categoria = categoria;
 	}
 
 	public String getTitulo()
@@ -65,14 +60,64 @@ public class Livro
 		this.preco = preco;
 	}
 
-	public float getDesconto()
+	public int getPaginas()
 	{
-		return desconto;
+		return paginas;
 	}
 
-	public void setDesconto(float desconto)
+	public void setPaginas(int paginas)
 	{
-		this.desconto = desconto;
+		this.paginas = paginas;
+	}
+
+	public int getCapa()
+	{
+		return capa;
+	}
+
+	public void setCapa(int capa)
+	{
+		this.capa = capa;
+	}
+
+	public String getResumo()
+	{
+		return resumo;
+	}
+
+	public void setResumo(String resumo)
+	{
+		this.resumo = resumo;
+	}
+
+	public String getSumario()
+	{
+		return sumario;
+	}
+
+	public void setSumario(String sumario)
+	{
+		this.sumario = sumario;
+	}
+
+	public float getPrecoCusto()
+	{
+		return precoCusto;
+	}
+
+	public void setPrecoCusto(float precoCusto)
+	{
+		this.precoCusto = precoCusto;
+	}
+
+	public float getMargemLucro()
+	{
+		return margemLucro;
+	}
+
+	public void setMargemLucro(float margemLucro)
+	{
+		this.margemLucro = margemLucro;
 	}
 
 	public Date getPublicacao()
@@ -97,6 +142,11 @@ public class Livro
 
 	public LivroAutores getLivroAutores()
 	{
-		return autores == null ? (autores = new LivroAutores(this)) : autores;
+		return autores == null ? (autores = new LivroAutores()) : autores;
+	}
+
+	public LivroCategorias getLivroCategorias()
+	{
+		return categorias == null ? (categorias = new LivroCategorias()) : categorias;
 	}
 }

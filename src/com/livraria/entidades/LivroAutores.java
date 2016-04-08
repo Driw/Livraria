@@ -6,18 +6,11 @@ import org.diverproject.util.collection.abstraction.DynamicList;
 
 public class LivroAutores
 {
-	private Livro livro;
 	private List<Autor> autores;
 
-	public LivroAutores(Livro livro)
+	public LivroAutores()
 	{
-		this.livro = livro;
 		this.autores = new DynamicList<Autor>();
-	}
-
-	public Livro getLivro()
-	{
-		return livro;
 	}
 
 	public int tamanho()
@@ -55,5 +48,10 @@ public class LivroAutores
 			lista[i] = autores.get(i);
 
 		return lista;
+	}
+
+	public void limpar()
+	{
+		autores.clear();
 	}
 }

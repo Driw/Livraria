@@ -1,6 +1,8 @@
 
 package com.livraria.entidades;
 
+import java.sql.Date;
+
 public class Editora
 {
 	private int id;
@@ -8,6 +10,8 @@ public class Editora
 	private String nome;
 	private String endereco;
 	private String telefone;
+	private Date contratoInicio;
+	private Date contratoFim;
 
 	public int getID()
 	{
@@ -57,5 +61,41 @@ public class Editora
 	public void setTelefone(String telefone)
 	{
 		this.telefone = telefone;
+	}
+
+	public Date getContratoInicio()
+	{
+		return contratoInicio;
+	}
+
+	public Date getContratoFim()
+	{
+		return contratoFim;
+	}
+
+	public void setContrato(Date contratoInicio, Date contratoFim)
+	{
+		if (contratoInicio != null && contratoFim != null)
+		{
+			this.contratoInicio = contratoInicio;
+			this.contratoFim = contratoFim;
+		}
+	}
+
+	public boolean validarCNPJ()
+	{
+		// TODO
+
+		return true;
+	}
+
+	public boolean hasContrato()
+	{
+		return contratoInicio != null && contratoFim != null;
+	}
+
+	public int getDuracaoContrato()
+	{
+		return !hasContrato() ? 0 : (int) (contratoFim.getTime() - contratoInicio.getTime() / 86400);
 	}
 }

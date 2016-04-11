@@ -6,8 +6,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Vector;
 
 import org.diverproject.util.sql.MySQL;
 
@@ -90,7 +89,7 @@ public class ControleAutor
 		return autor;
 	}
 
-	public List<Autor> filtrarPorNome(String nome) throws SQLException
+	public Vector<Autor> filtrarPorNome(String nome) throws SQLException
 	{
 		String sql = "SELECT * FROM autores WHERE nome LIKE '%?%'";
 
@@ -102,7 +101,7 @@ public class ControleAutor
 		return concluirFiltragem(rs);
 	}
 
-	public List<Autor> filtrarPorLocalMorte(String localMorte) throws SQLException
+	public Vector<Autor> filtrarPorLocalMorte(String localMorte) throws SQLException
 	{
 		String sql = "SELECT * FROM autores WHERE local_morte LIKE '%?%'";
 
@@ -114,7 +113,7 @@ public class ControleAutor
 		return concluirFiltragem(rs);
 	}
 
-	public List<Autor> filtrarPorBiografia(String biografia) throws SQLException
+	public Vector<Autor> filtrarPorBiografia(String biografia) throws SQLException
 	{
 		String sql = "SELECT * FROM autores WHERE biografia LIKE '%?%'";
 
@@ -126,9 +125,9 @@ public class ControleAutor
 		return concluirFiltragem(rs);
 	}
 
-	public List<Autor> concluirFiltragem(ResultSet rs) throws SQLException
+	public Vector<Autor> concluirFiltragem(ResultSet rs) throws SQLException
 	{
-		List<Autor> autores = new ArrayList<Autor>();
+		Vector<Autor> autores = new Vector<Autor>();
 
 		while (rs.next())
 		{
@@ -143,5 +142,12 @@ public class ControleAutor
 		}
 
 		return autores;
+	}
+	
+	public int getId(String nome) throws SQLException {
+		PreparedStatement ps = connection.prepareStatement("SELECT id FROM autores WHERE nome LIKE '%?%'");
+		ps.setString(1, nome);
+		ResultSet rs = ps.executeQuery();
+		return rs.getInt("id");
 	}
 }

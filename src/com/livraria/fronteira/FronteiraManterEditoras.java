@@ -2,19 +2,27 @@ package com.livraria.fronteira;
 
 import java.awt.Container;
 import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Vector;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
-import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
-import java.awt.GridLayout;
-import javax.swing.JScrollPane;
-import javax.swing.JComboBox;
+
+import com.livraria.controle.ControleEditora;
+import com.livraria.entidades.Editora;
 
 @SuppressWarnings("serial")
 public class FronteiraManterEditoras extends Container implements IFronteira
@@ -27,6 +35,10 @@ public class FronteiraManterEditoras extends Container implements IFronteira
 	private JTextField tfContratoInicio;
 	private JTextField tfContratoFim;
 	private JTextField tfFiltro;
+	private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+	private ControleEditora controleEditora = new ControleEditora();
+	private ModelManterEditoras model;
+	private JComboBox<String> cbFiltro;
 
 	public FronteiraManterEditoras()
 	{
@@ -146,7 +158,7 @@ public class FronteiraManterEditoras extends Container implements IFronteira
 		tfFiltro.setBounds(100, 22, 395, 25);
 		panelConsulta.add(tfFiltro);
 		
-		JComboBox<String> cbFiltro = new JComboBox<String>();
+		cbFiltro = new JComboBox<String>();
 		cbFiltro.setBounds(505, 22, 145, 25);
 		cbFiltro.addItem("Nome");
 		cbFiltro.addItem("Endereço");
@@ -155,7 +167,7 @@ public class FronteiraManterEditoras extends Container implements IFronteira
 		cbFiltro.addItem("Contrato");
 		panelConsulta.add(cbFiltro);
 
-		ModelManterEditoras model = new ModelManterEditoras();
+		model = new ModelManterEditoras();
 
 		tabelaConsulta = new JTable();
 		tabelaConsulta.setModel(model);
@@ -195,11 +207,110 @@ public class FronteiraManterEditoras extends Container implements IFronteira
 		JButton btnConsultaVerLivros = new JButton("Ver Livros");
 		btnConsultaVerLivros.setFont(Fronteira.FONT_COMPONENTES);
 		panelConsultaAcoes.add(btnConsultaVerLivros);
+		
+		btnAdicionar.addActionListener( this );
+		btnAtualizar.addActionListener( this );
+		btnLimpar.addActionListener( this );
+		btnConsultaSelecionar.addActionListener( this );
+		btnConsultaExcluir.addActionListener( this );
 	}
 
 	@Override
 	public String getTitle()
 	{
 		return "Manter Editoras";
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(e.getActionCommand() == "Adicionar")
+		{
+			try
+			{
+				Editora editora = new Editora();
+				editora.setNome(tfNome.getText());
+				editora.setCnpj(tfCnpj.getText());
+				editora.setEndereco(tfEndereco.getText());
+				editora.setTelefone(tfTelefone.getText());
+				editora.setContrato(format.parse(tfContratoInicio.getText()), format.parse(tfContratoFim.getText()));
+				controleEditora.adicionar(editora);
+			}
+			catch (ParseException | SQLException e1)
+			{
+				e1.printStackTrace();
+			}
+			
+		}
+		else if (e.getActionCommand() == "Atualizar")
+		{
+			try
+			{
+				Editora editora = new Editora();
+				editora.setID(controleEditora.getId(tfNome.getText()));
+				editora.setNome(tfNome.getText());
+				editora.setCnpj(tfCnpj.getText());
+				editora.setEndereco(tfEndereco.getText());
+				editora.setTelefone(tfTelefone.getText());
+				editora.setContrato(format.parse(tfContratoInicio.getText()), format.parse(tfContratoFim.getText()));
+				controleEditora.atualizar(editora);
+			}
+			catch (ParseException | SQLException e1)
+			{
+				e1.printStackTrace();
+			}
+		}
+		else if (e.getActionCommand() == "Excluir")
+		{
+			try
+			{
+				controleEditora.excluir(model.getLinha(tabelaConsulta.getSelectedRow()).getID());
+				tfNome.setText("");
+				tfCnpj.setText("");
+				tfEndereco.setText("");
+				tfTelefone.setText("");
+				tfContratoInicio.setText("");
+				tfContratoFim.setText("");
+				model.removeRow(tabelaConsulta.getSelectedRow());
+			}
+			catch (SQLException e1)
+			{
+				e1.printStackTrace();
+			}
+		}
+		else if (e.getActionCommand() == "Selecionar")
+		{
+			try
+			{
+				Vector<Editora> editoras = new Vector<Editora>();
+				if (cbFiltro.getSelectedIndex() == 1)
+				{
+					editoras = controleEditora.filtrarPorCNPJ(tfFiltro.getText());
+				}
+				else if (cbFiltro.getSelectedIndex() == 2)
+				{
+					editoras = controleEditora.filtrarPorNome(tfFiltro.getText());
+				}
+				else if (cbFiltro.getSelectedIndex() == 3)
+				{
+					editoras = controleEditora.filtrarPorTelefone(tfFiltro.getText());
+				}
+				
+				model.addRow(editoras);
+			}
+			catch (SQLException e1)
+			{
+				e1.printStackTrace();
+			}
+		}
+		else if (e.getActionCommand() == "Limpar")
+		{
+			tfNome.setText("");
+			tfCnpj.setText("");
+			tfEndereco.setText("");
+			tfTelefone.setText("");
+			tfContratoInicio.setText("");
+			tfContratoFim.setText("");
+		}
+		
 	}
 }

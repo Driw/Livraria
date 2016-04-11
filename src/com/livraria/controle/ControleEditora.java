@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import org.diverproject.util.sql.MySQL;
 
@@ -100,7 +101,7 @@ public class ControleEditora
 		return editoras;
 	}
 
-	public List<Editora> filtrarPorCNPJ(String cnpj) throws SQLException
+	public Vector<Editora> filtrarPorCNPJ(String cnpj) throws SQLException
 	{
 		String sql = "SELECT * FROM editoras WHERE cnpj LIKE '?%'";
 
@@ -112,7 +113,7 @@ public class ControleEditora
 		return concluirFiltragem(rs);
 	}
 
-	public List<Editora> filtrarPorNome(String nome) throws SQLException
+	public Vector<Editora> filtrarPorNome(String nome) throws SQLException
 	{
 		String sql = "SELECT * FROM editoras WHERE nome = '%?%'";
 
@@ -124,7 +125,7 @@ public class ControleEditora
 		return concluirFiltragem(rs);
 	}
 
-	public List<Editora> filtrarPorTelefone(String telefone) throws SQLException
+	public Vector<Editora> filtrarPorTelefone(String telefone) throws SQLException
 	{
 		String sql = "SELECT * FROM editoras WHERE telefone LIKE '?%'";
 
@@ -136,9 +137,9 @@ public class ControleEditora
 		return concluirFiltragem(rs);
 	}
 
-	public List<Editora> concluirFiltragem(ResultSet rs) throws SQLException
+	public Vector<Editora> concluirFiltragem(ResultSet rs) throws SQLException
 	{
-		List<Editora> editoras = new ArrayList<Editora>();
+		Vector<Editora> editoras = new Vector<Editora>();
 
 		while (rs.next())
 		{
@@ -153,4 +154,13 @@ public class ControleEditora
 
 		return editoras;
 	}
+	
+	public int getId(String nome) throws SQLException {
+		PreparedStatement ps = connection.prepareStatement("SELECT id FROM editoras WHERE nome LIKE '%?%'");
+		ps.setString(1, nome);
+		ResultSet rs = ps.executeQuery();
+		return rs.getInt("id");
+	}
+	
+	
 }

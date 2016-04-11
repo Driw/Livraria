@@ -1,22 +1,30 @@
 package com.livraria.fronteira;
 
+import java.awt.Color;
 import java.awt.Container;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Vector;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import java.awt.Font;
-import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
-import javax.swing.UIManager;
-import java.awt.Color;
-import java.awt.GridLayout;
-import javax.swing.JComboBox;
 import javax.swing.ListSelectionModel;
-import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.border.TitledBorder;
+
+import com.livraria.controle.ControleAutor;
+import com.livraria.entidades.Autor;
 
 @SuppressWarnings("serial")
 public class FronteiraManterAutores extends Container implements IFronteira
@@ -28,9 +36,13 @@ public class FronteiraManterAutores extends Container implements IFronteira
 	private JTextField tfBiografia;
 	private JTable tableConsulta;
 	private JTextField tfFiltro;
+	private ControleAutor controleAutor = new ControleAutor();
+	private JComboBox<String> cbFiltro;
+	private ModelManterAutores model;
+	SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
 	public FronteiraManterAutores()
-	{
+	{		
 		setSize(850, 540);
 
 		JLabel lblGerenciarAutores = new JLabel("GERENCIAR AUTORES");
@@ -54,7 +66,7 @@ public class FronteiraManterAutores extends Container implements IFronteira
 		tfNome = new JTextField();
 		tfNome.setBounds(170, 19, 479, 25);
 		panelDados.add(tfNome);
-
+		
 		JLabel lblDataDeNascimento = new JLabel("Data de Nascimento :");
 		lblDataDeNascimento.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblDataDeNascimento.setFont(Fronteira.FONT_COMPONENTES);
@@ -186,11 +198,107 @@ public class FronteiraManterAutores extends Container implements IFronteira
 		JButton btnConsultaVerLivros = new JButton("Ver Livros");
 		btnConsultaVerLivros.setFont(Fronteira.FONT_COMPONENTES);
 		panelConsultaAcoes.add(btnConsultaVerLivros);
+		
+		btnAdicionar.addActionListener( this );
+		btnAtualizar.addActionListener( this );
+		btnLimpar.addActionListener( this );
+		btnConsultaSelecionar.addActionListener( this );
+		btnConsultaExcluir.addActionListener( this );
 	}
 
 	@Override
 	public String getTitle()
 	{
 		return "Manter Autores";
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(e.getActionCommand() == "Adicionar")
+		{
+			try
+			{
+				Autor a = new Autor();
+				a.setNome(tfNome.getText());
+				a.setNascimento(format.parse(tfDataNascimento.getText()));
+				a.setFalecimento(format.parse(tfDataFalecimento.getText()));
+				a.setLocalMorte(tfLocalMorte.getText());
+				a.setBiografia(tfBiografia.getText());
+				controleAutor.adicionar(a);
+			}
+			catch (ParseException | SQLException e1)
+			{
+				e1.printStackTrace();
+			}
+			
+		}
+		else if (e.getActionCommand() == "Atualizar")
+		{
+			try
+			{
+				Autor a = new Autor();
+				a.setNome(tfNome.getText());
+				a.setNascimento(format.parse(tfDataNascimento.getText()));
+				a.setFalecimento(format.parse(tfDataFalecimento.getText()));
+				a.setLocalMorte(tfLocalMorte.getText());
+				a.setBiografia(tfBiografia.getText());
+				controleAutor.atualizar(a);
+			}
+			catch (ParseException | SQLException e1)
+			{
+				e1.printStackTrace();
+			}
+		}
+		else if (e.getActionCommand() == "Excluir")
+		{
+			try
+			{
+				controleAutor.excluir(model.getLinha(tableConsulta.getSelectedRow()).getID());
+				tfNome.setText("");
+				tfDataNascimento.setText("");
+				tfDataFalecimento.setText("");
+				tfLocalMorte.setText("");
+				tfBiografia.setText("");
+				model.removeRow(tableConsulta.getSelectedRow());
+			}
+			catch (SQLException e1)
+			{
+				e1.printStackTrace();
+			}
+		}
+		else if (e.getActionCommand() == "Selecionar")
+		{
+			try
+			{
+				Vector<Autor> autores = new Vector<Autor>();
+				if (cbFiltro.getSelectedIndex() == 1)
+				{
+					autores = controleAutor.filtrarPorNome(tfFiltro.getText());
+				}
+				else if (cbFiltro.getSelectedIndex() == 2)
+				{
+					autores = controleAutor.filtrarPorLocalMorte(tfFiltro.getText());
+				}
+				else if (cbFiltro.getSelectedIndex() == 3)
+				{
+					autores = controleAutor.filtrarPorBiografia(tfFiltro.getText());
+				}
+				
+				model.addRow(autores);
+			}
+			catch (SQLException e1)
+			{
+				e1.printStackTrace();
+			}
+		}
+		else if (e.getActionCommand() == "Limpar")
+		{
+			tfNome.setText("");
+			tfDataNascimento.setText("");
+			tfDataFalecimento.setText("");
+			tfLocalMorte.setText("");
+			tfBiografia.setText("");
+		}
+		
 	}
 }

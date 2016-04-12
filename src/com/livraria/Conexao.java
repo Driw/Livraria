@@ -8,6 +8,8 @@ import org.diverproject.util.sql.MySQL;
 
 public class Conexao
 {
+	public static final int UPDATE_SUCCESSFUL = 0;
+
 	private static final MySQL mysql;
 
 	static

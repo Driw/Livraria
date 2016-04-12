@@ -137,8 +137,8 @@ public class ControleLivro
 		livro.setPrecoCusto(rs.getFloat("preco_custo"));
 		livro.setMargemLucro(rs.getFloat("margem_lucro"));
 
-		selecionarCategorias(livro);
-		selecionarAutores(livro);
+		carregarCategorias(livro);
+		carregarAutores(livro);
 
 		return livro;
 	}
@@ -173,7 +173,7 @@ public class ControleLivro
 		return ps.executeUpdate() == PreparedStatement.EXECUTE_FAILED;
 	}
 
-	private void selecionarCategorias(Livro livro) throws SQLException
+	public void carregarCategorias(Livro livro) throws SQLException
 	{
 		String sql = "SELECT cdus.id, cdus.nome, cdus.tema"
 					+" INNER JOIN cdus ON cdus.id = livros_categorias.categoria"
@@ -226,7 +226,7 @@ public class ControleLivro
 		return ps.executeUpdate() == PreparedStatement.EXECUTE_FAILED;
 	}
 
-	private void selecionarAutores(Livro livro) throws SQLException
+	public void carregarAutores(Livro livro) throws SQLException
 	{
 		String sql = "SELECT autores.id, autores.nome, autores.nascimento, autores.falecimento,"
 					+" autores.localMorte, autores.biografia FROM livros_categorias"

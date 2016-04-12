@@ -1,12 +1,23 @@
 
 package com.livraria.entidades;
 
+import java.util.Date;
+
 import org.diverproject.util.collection.List;
 import org.diverproject.util.collection.abstraction.DynamicList;
 
 public class Carrinho
 {
-	private int id;
+	public static final int CARRINHO_CRIADO = 1;
+	public static final int CARRINHO_GUARDADO = 2;
+	public static final int CARRINHO_ENVIADO = 3;
+	public static final int CARRINHO_EM_ESPERA = 4;
+	public static final int CARRINHO_CONCLUIDO = 5;
+
+	private int numeroPedido;
+	private Date criado;
+	private Date concluido;
+	private int estado;
 	private List<CarrinhoItem> items;
 
 	public Carrinho()
@@ -16,17 +27,52 @@ public class Carrinho
 
 	public int getID()
 	{
-		return id;
+		return numeroPedido;
 	}
 
 	public void setID(int id)
 	{
-		this.id = id;
+		this.numeroPedido = id;
+	}
+
+	public Date getCriado()
+	{
+		return criado;
+	}
+
+	public void setCriado(Date criado)
+	{
+		this.criado = criado;
+	}
+
+	public Date getConcluido()
+	{
+		return concluido;
+	}
+
+	public void setConcluido(Date concluido)
+	{
+		this.concluido = concluido;
+	}
+
+	public int getEstado()
+	{
+		return estado;
+	}
+
+	public void setEstado(int estado)
+	{
+		this.estado = estado;
 	}
 
 	public Livro getLivro(int indice)
 	{
 		return items.get(indice).getLivro();
+	}
+
+	public int getQuantidade(int indice)
+	{
+		return items.get(indice).getQuantidade();
 	}
 
 	public void adicionar(int quantidade, Livro livro)
@@ -66,5 +112,10 @@ public class Carrinho
 			livros[i] = this.items.get(i).getLivro();
 
 		return livros;
+	}
+
+	public int getNumeroItens()
+	{
+		return items.size();
 	}
 }

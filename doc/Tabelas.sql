@@ -78,6 +78,7 @@ CREATE TABLE carrinhos
 	id INT AUTO_INCREMENT,
 	criado DATE,
 	concluido DATE,
+	estado INT,
 
 	PRIMARY KEY (id)
 );

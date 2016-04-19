@@ -1,0 +1,20 @@
+	RELATORIO DE TESTE MANTER AUTORES
+O caso de uso esta funcionando com alguns problemas!!!
+
+1 - Nenhum botao nao da a resposta do que foi realizado com sucesso 
+
+2 - Nenhum botao nao da a resposta de NÂO realizado com sucesso(caso nao tenha sido realizado com sucesso
+
+3 - Os Itens de data precisao ser mascarados pois, eles só aceitam no formato xx/xx/xxx, caso  o usuário nao digite a ( / ) ele nao cadastra, ou se ele substituir pelo ( - ) ele tbm nao realiza o cadastro, sugiro que coloque o padrao ( / ) para que fique no mesmo formato e ja fica em um padão
+
+5- No caso do que tenhar q receber só numeros colocar uma resposta quando o usuario digitar alguma letra, informando que o mesmo só recebe numeros, 
+
+6- o campo consultar nao esta funcionando nenhuma das opçoes de consulta, com isso os botoes tbm nao estao funcionando tbm, 
+
+7- o Botao exculir/ atualizar, do campo ações esta inativo pois o programa nao consegue fazer a consulta, mesmo digitando os respectivos  nomes nos determinados campos ele nao realiza a exclusao nem a atualização 
+
+
+
+
+
+

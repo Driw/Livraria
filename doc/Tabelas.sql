@@ -21,8 +21,6 @@ CREATE TABLE livros
 	capa INT,
 	resumo VARCHAR(4096),
 	sumario VARCHAR(1024),
-	preco_custo FLOAT,
-	margem_lucro FLOAT,
 
 	PRIMARY KEY (id),
 	UNIQUE (isbn),

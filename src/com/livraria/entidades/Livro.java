@@ -14,8 +14,6 @@ public class Livro
 	private int capa;
 	private String resumo;
 	private String sumario;
-	private float precoCusto;
-	private float margemLucro;
 	private Editora editora;
 	private LivroAutores autores;
 	private LivroCategorias categorias;
@@ -98,26 +96,6 @@ public class Livro
 	public void setSumario(String sumario)
 	{
 		this.sumario = sumario;
-	}
-
-	public float getPrecoCusto()
-	{
-		return precoCusto;
-	}
-
-	public void setPrecoCusto(float precoCusto)
-	{
-		this.precoCusto = precoCusto;
-	}
-
-	public float getMargemLucro()
-	{
-		return margemLucro;
-	}
-
-	public void setMargemLucro(float margemLucro)
-	{
-		this.margemLucro = margemLucro;
 	}
 
 	public Date getPublicacao()

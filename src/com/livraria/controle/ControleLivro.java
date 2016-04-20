@@ -34,7 +34,7 @@ public class ControleLivro
 		Date publicacao = new Date(livro.getPublicacao().getTime());
 
 		String sql = "INSERT INTO livros (isbn, titulo, editora, preco, publicacao, pagina, capa,"
-					+" resumo, sumario, preco_custo, margem_lucro)"
+					+" resumo, sumario)"
 					+" values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
@@ -47,8 +47,6 @@ public class ControleLivro
 		ps.setInt(7, livro.getCapa());
 		ps.setString(8, livro.getResumo());
 		ps.setString(9, livro.getSumario());
-		ps.setFloat(10, livro.getPrecoCusto());
-		ps.setFloat(11, livro.getMargemLucro());
 
 		if (!ps.execute())
 			return false;
@@ -72,7 +70,7 @@ public class ControleLivro
 		Date publicacao = new Date(livro.getPublicacao().getTime());
 
 		String sql = "UPDATE livros SET isbn = ?, titulo = ?, editora = ?, preco = ?, publicacao = ?"
-					+" paginas = ?, capa = ?, resumo = ?, sumario = ?, preco_custo = ?, margem_lucro = ?"
+					+" paginas = ?, capa = ?, resumo = ?, sumario = ?"
 					+" WHERE id = ?";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
@@ -85,9 +83,7 @@ public class ControleLivro
 		ps.setInt(7, livro.getCapa());
 		ps.setString(8, livro.getResumo());
 		ps.setString(9, livro.getSumario());
-		ps.setFloat(10, livro.getPrecoCusto());
-		ps.setFloat(11, livro.getMargemLucro());
-		ps.setInt(12, livro.getID());
+		ps.setInt(10, livro.getID());
 
 		return ps.executeUpdate() != PreparedStatement.EXECUTE_FAILED;
 	}
@@ -134,8 +130,6 @@ public class ControleLivro
 		livro.setCapa(rs.getInt("capa"));
 		livro.setResumo(rs.getString("resumo"));
 		livro.setSumario(rs.getString("sumario"));
-		livro.setPrecoCusto(rs.getFloat("preco_custo"));
-		livro.setMargemLucro(rs.getFloat("margem_lucro"));
 
 		carregarCategorias(livro);
 		carregarAutores(livro);
@@ -335,8 +329,6 @@ public class ControleLivro
 			livro.setCapa(rs.getInt("capa"));
 			livro.setResumo(rs.getString("resumo"));
 			livro.setSumario(rs.getString("sumario"));
-			livro.setPrecoCusto(rs.getFloat("preco_custo"));
-			livro.setMargemLucro(rs.getFloat("margem_lucro"));
 			livros.add(livro);
 		}
 

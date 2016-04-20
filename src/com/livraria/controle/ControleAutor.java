@@ -6,7 +6,8 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.diverproject.util.sql.MySQL;
 
@@ -25,8 +26,14 @@ public class ControleAutor
 	
 	public boolean adicionar(Autor autor) throws SQLException
 	{
-		Date nascimento = new Date(autor.getNascimento().getTime());
-		Date falecimento = new Date(autor.getFalecimento().getTime());
+		Date nascimento = null;
+		Date falecimento = null;
+
+		if (autor.getNascimento() != null)
+			nascimento = new Date(autor.getNascimento().getTime());
+
+		if (autor.getFalecimento() != null)
+			falecimento = new Date(autor.getFalecimento().getTime());
 
 		String sql = "INSERT INTO autores (nome, nascimento, falecimento, local_morte, biografia)"
 					+" values (?, ?, ?, ?, ?)";
@@ -38,7 +45,7 @@ public class ControleAutor
 		ps.setString(4, autor.getLocalMorte());
 		ps.setString(5, autor.getBiografia());
 
-		return ps.execute();
+		return ps.executeUpdate() == Conexao.INSERT_SUCCESSFUL;
 	}
 
 	public boolean atualizar(Autor autor) throws SQLException
@@ -57,7 +64,7 @@ public class ControleAutor
 		ps.setString(5, autor.getBiografia());
 		ps.setInt(6, autor.getID());
 
-		return ps.executeUpdate() != PreparedStatement.EXECUTE_FAILED;
+		return ps.executeUpdate() == Conexao.UPDATE_SUCCESSFUL;
 	}
 
 	public boolean excluir(int id) throws SQLException
@@ -67,7 +74,7 @@ public class ControleAutor
 		PreparedStatement ps = connection.prepareStatement(sql);
 		ps.setInt(1, id);
 
-		return ps.executeUpdate() == PreparedStatement.EXECUTE_FAILED;
+		return ps.executeUpdate() == Conexao.DELETE_SUCCESSFUL;
 	}
 
 	public Autor selecionar(int id) throws SQLException
@@ -89,45 +96,49 @@ public class ControleAutor
 		return autor;
 	}
 
-	public Vector<Autor> filtrarPorNome(String nome) throws SQLException
+	public List<Autor> listar() throws SQLException
 	{
-		String sql = "SELECT * FROM autores WHERE nome LIKE '%?%'";
+		String sql = "SELECT * FROM autores";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
-		ps.setString(1, nome);
-
 		ResultSet rs = ps.executeQuery();
 
 		return concluirFiltragem(rs);
 	}
 
-	public Vector<Autor> filtrarPorLocalMorte(String localMorte) throws SQLException
+	public List<Autor> filtrarPorNome(String nome) throws SQLException
 	{
-		String sql = "SELECT * FROM autores WHERE local_morte LIKE '%?%'";
+		String sql = "SELECT * FROM autores WHERE nome LIKE '%" +nome+ "%'";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
-		ps.setString(1, localMorte);
-
 		ResultSet rs = ps.executeQuery();
 
 		return concluirFiltragem(rs);
 	}
 
-	public Vector<Autor> filtrarPorBiografia(String biografia) throws SQLException
+	public List<Autor> filtrarPorLocalMorte(String localMorte) throws SQLException
 	{
-		String sql = "SELECT * FROM autores WHERE biografia LIKE '%?%'";
+		String sql = "SELECT * FROM autores WHERE local_morte LIKE '%" +localMorte+ "%'";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
-		ps.setString(1, biografia);
-
 		ResultSet rs = ps.executeQuery();
 
 		return concluirFiltragem(rs);
 	}
 
-	public Vector<Autor> concluirFiltragem(ResultSet rs) throws SQLException
+	public List<Autor> filtrarPorBiografia(String biografia) throws SQLException
 	{
-		Vector<Autor> autores = new Vector<Autor>();
+		String sql = "SELECT * FROM autores WHERE biografia LIKE '%" +biografia+ "%'";
+
+		PreparedStatement ps = connection.prepareStatement(sql);
+		ResultSet rs = ps.executeQuery();
+
+		return concluirFiltragem(rs);
+	}
+
+	public List<Autor> concluirFiltragem(ResultSet rs) throws SQLException
+	{
+		List<Autor> autores = new ArrayList<Autor>();
 
 		while (rs.next())
 		{
@@ -136,7 +147,7 @@ public class ControleAutor
 			autor.setNome(rs.getString("nome"));
 			autor.setNascimento(rs.getDate("nascimento"));
 			autor.setFalecimento(rs.getDate("falecimento"));
-			autor.setLocalMorte(rs.getString("localMorte"));
+			autor.setLocalMorte(rs.getString("local_morte"));
 			autor.setBiografia(rs.getString("biografia"));
 			autores.add(autor);
 		}

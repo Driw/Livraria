@@ -8,7 +8,9 @@ import org.diverproject.util.sql.MySQL;
 
 public class Conexao
 {
-	public static final int UPDATE_SUCCESSFUL = 0;
+	public static final int UPDATE_SUCCESSFUL = 1;
+	public static final int INSERT_SUCCESSFUL = 1;
+	public static final int DELETE_SUCCESSFUL = 1;
 
 	private static final MySQL mysql;
 

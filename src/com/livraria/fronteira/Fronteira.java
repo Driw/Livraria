@@ -171,7 +171,7 @@ public class Fronteira
 
 	private void callPesquisarLivros()
 	{
-//		setFronteira(FronteiraPesquisarLivros.class);
+		setFronteira(FronteiraPesquisarLivros.class);
 	}
 
 	private void callVisualizarCarrinho()

@@ -12,11 +12,11 @@ import com.livraria.entidades.Autor;
 @SuppressWarnings("serial")
 public class ModelManterAutores extends DefaultTableModel
 {
-	private static final int COLUNA_NOME = 1;
-	private static final int COLUNA_NASCIMENTO = 2;
-	private static final int COLUNA_FALECIMENTO = 3;
-	private static final int COLUNA_LOCAL_MORTE = 4;
-	private static final int COLUNA_BIOGRAFIA = 5;
+	private static final int COLUNA_NOME = 0;
+	private static final int COLUNA_NASCIMENTO = 1;
+	private static final int COLUNA_FALECIMENTO = 2;
+	private static final int COLUNA_LOCAL_MORTE = 3;
+	private static final int COLUNA_BIOGRAFIA = 4;
 
 	private static final String COLUNS[] = new String[]
 	{
@@ -66,7 +66,12 @@ public class ModelManterAutores extends DefaultTableModel
 				case COLUNA_NASCIMENTO: return DateUtil.toString(autor.getNascimento());
 				case COLUNA_FALECIMENTO: return DateUtil.toString(autor.getFalecimento());
 				case COLUNA_LOCAL_MORTE: return autor.getLocalMorte();
-				case COLUNA_BIOGRAFIA: return autor.getBiografia().substring(0, 60);
+				case COLUNA_BIOGRAFIA:
+					if (autor.getBiografia() == null)
+						return "-";
+					else if (autor.getBiografia().length() < 60)
+						return autor.getBiografia();
+					return autor.getBiografia().substring(0, 60);
 			}
 
 		return null;
@@ -81,6 +86,13 @@ public class ModelManterAutores extends DefaultTableModel
 	public Autor getLinha(int linha)
 	{
 		return autores.get(linha);
+	}
+
+	public void removerLinha(int linha)
+	{
+		autores.remove(linha);
+
+		fireTableDataChanged();
 	}
 
 	public void atualizarLista(List<Autor> lista)

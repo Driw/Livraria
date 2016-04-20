@@ -1,7 +1,6 @@
 package com.livraria.fronteira;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -20,7 +19,7 @@ import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
 @SuppressWarnings("serial")
-public class FronteiraManterLivros extends Container implements IFronteira
+public class FronteiraManterLivros extends JPanel implements IFronteira
 {
 	private JTable tableConsulta;
 	private JTextField tfFiltro;

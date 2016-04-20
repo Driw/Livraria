@@ -1,7 +1,6 @@
 package com.livraria.fronteira;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -27,7 +26,7 @@ import com.livraria.controle.ControleAutor;
 import com.livraria.entidades.Autor;
 
 @SuppressWarnings("serial")
-public class FronteiraManterAutores extends Container implements IFronteira
+public class FronteiraManterAutores extends JPanel implements IFronteira
 {
 	private JTextField tfNome;
 	private JTextField tfDataNascimento;

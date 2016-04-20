@@ -1,6 +1,5 @@
 package com.livraria.fronteira;
 
-import java.awt.Container;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -25,7 +24,7 @@ import com.livraria.controle.ControleEditora;
 import com.livraria.entidades.Editora;
 
 @SuppressWarnings("serial")
-public class FronteiraManterEditoras extends Container implements IFronteira
+public class FronteiraManterEditoras extends JPanel implements IFronteira
 {
 	private JTextField tfNome;
 	private JTextField tfCnpj;

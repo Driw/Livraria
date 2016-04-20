@@ -6,19 +6,31 @@ import static org.diverproject.util.MessageUtil.showException;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
 
 import com.livraria.JanelaListener;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 
 public class Fronteira
 {
+	private static final int WIDTH_DIFF = 26;
+	private static final int HEIGHT_DIFF = 72;
+	private static final int FRONTEIRA_X = 10;
+	private static final int FRONTEIRA_Y = 11;
 	private static final Fronteira INSTANCIA = new Fronteira();
+
 	public static final Font FONT = new Font("verdana", Font.PLAIN, 12);
 	public static final Font FONT_TITULO = new Font("Tahoma", Font.PLAIN, 16);
 	public static final Font FONT_COMPONENTES = new Font("Tahoma", Font.PLAIN, 12);
 
 	private JFrame frame;
+	private JPanel panel;
 
 	private Fronteira()
 	{
@@ -26,11 +38,145 @@ public class Fronteira
 		frame.setFont(FONT);
 		frame.setTitle("Livraria");
 		frame.setSize(720, 480);
-		frame.setLayout(null);
+		frame.getContentPane().setLayout(null);
 		frame.setResizable(false);
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		int width = frame.getWidth() - WIDTH_DIFF;
+		int height = frame.getHeight() - HEIGHT_DIFF;
+
+		panel = new JPanel();
+		panel.setBounds(FRONTEIRA_X, FRONTEIRA_Y, width, height);
+		frame.getContentPane().add(panel);
+
+		JMenuBar menuBar = new JMenuBar();
+		frame.setJMenuBar(menuBar);
+
+		JMenu mnMenuPrincipal = new JMenu("Menu Principal");
+		menuBar.add(mnMenuPrincipal);
+
+		JMenuItem miPaginaInicial = new JMenuItem("Página Inicial");
+		miPaginaInicial.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callPaginaInicial();
+			}
+		});
+		mnMenuPrincipal.add(miPaginaInicial);
+
+		JMenuItem miManterAutores = new JMenuItem("Manter Autores");
+		miManterAutores.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callManterAutores();
+			}
+		});
+		mnMenuPrincipal.add(miManterAutores);
+
+		JMenuItem miManterEditoras = new JMenuItem("Manter Editoras");
+		miManterEditoras.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callManterEditoras();
+			}
+		});
+		mnMenuPrincipal.add(miManterEditoras);
+
+		JMenuItem miCategorias = new JMenuItem("Manter Categorias");
+		miCategorias.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callManterCategorias();
+			}
+		});
+		mnMenuPrincipal.add(miCategorias);
+
+		JMenuItem miLivros = new JMenuItem("Manter Livros");
+		miLivros.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callManterLivros();
+			}
+		});
+		mnMenuPrincipal.add(miLivros);
+
+		JMenu mbCarrinho = new JMenu("Carrinho de Compras");
+		menuBar.add(mbCarrinho);
+
+		JMenuItem miPesquisarLivros = new JMenuItem("Pesquisar Livros");
+		miPesquisarLivros.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callPesquisarLivros();
+			}
+		});
+		mbCarrinho.add(miPesquisarLivros);
+
+		JMenuItem miVisualizarCarrinho = new JMenuItem("Visualizar Carrinho");
+		miVisualizarCarrinho.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callVisualizarCarrinho();
+			}
+		});
+		mbCarrinho.add(miVisualizarCarrinho);
+
+		JMenu mnMinhaConta = new JMenu("Minha Conta");
+		menuBar.add(mnMinhaConta);
+
+		JMenu mnRelatorios = new JMenu("Relatórios");
+		menuBar.add(mnRelatorios);
 		frame.addWindowListener(JanelaListener.getInstancia());
+	}
+
+	private void callPaginaInicial()
+	{
+		setFronteira(FronteiraInicial.class);
+	}
+
+	private void callManterAutores()
+	{
+		setFronteira(FronteiraManterAutores.class);
+	}
+
+	private void callManterEditoras()
+	{
+		setFronteira(FronteiraManterEditoras.class);
+	}
+
+	private void callManterCategorias()
+	{
+		setFronteira(FronteiraManterCategorias.class);
+	}
+
+	private void callManterLivros()
+	{
+		setFronteira(FronteiraManterLivros.class);
+	}
+
+	private void callPesquisarLivros()
+	{
+//		setFronteira(FronteiraPesquisarLivros.class);
+	}
+
+	private void callVisualizarCarrinho()
+	{
+		setFronteira(FronteiraCarrinhoDeCompras.class);
 	}
 
 	public void setFronteira(Class<?> classe)
@@ -39,12 +185,12 @@ public class Fronteira
 
 			Object instancia = classe.newInstance();
 
-			if (instancia instanceof Container)
+			if (instancia instanceof JPanel)
 			{
-				Container container = (Container) instancia;
+				JPanel panel = (JPanel) instancia;
 
-				prepararContainer(container);
-				usarContainer(container);
+				prepararContainer(panel);
+				usarContainer(panel);
 			}
 
 			else
@@ -65,15 +211,19 @@ public class Fronteira
 			container.setFont(FONT);
 	}
 
-	private void usarContainer(Container container)
+	private void usarContainer(JPanel panel)
 	{
-		frame.setContentPane(container);
-		frame.setSize(container.getWidth() + 8, container.getHeight() + 32);
+		frame.getContentPane().remove(this.panel);
+		this.panel = panel;
 
-		if (container instanceof IFronteira)
+		frame.setSize(panel.getWidth() + WIDTH_DIFF, panel.getHeight() + HEIGHT_DIFF);
+		frame.setLocationRelativeTo(null);
+		frame.getContentPane().add(panel);
+		panel.setLocation(FRONTEIRA_X, FRONTEIRA_Y);
+
+		if (panel instanceof IFronteira)
 		{
-			IFronteira fronteira = (IFronteira) container;
-			frame.setLocationRelativeTo(null);
+			IFronteira fronteira = (IFronteira) panel;
 			frame.setTitle(fronteira.getTitle());
 		}
 

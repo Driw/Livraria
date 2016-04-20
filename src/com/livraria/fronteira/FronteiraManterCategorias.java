@@ -3,9 +3,9 @@ package com.livraria.fronteira;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
-public class FronteiraCarrinhoDeCompras extends JPanel
+public class FronteiraManterCategorias extends JPanel
 {
-	public FronteiraCarrinhoDeCompras()
+	public FronteiraManterCategorias()
 	{
 		setSize(720, 480);
 	}

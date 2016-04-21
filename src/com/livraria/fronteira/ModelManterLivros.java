@@ -82,6 +82,13 @@ public class ModelManterLivros extends DefaultTableModel
 	{
 		return livros.get(linha);
 	}
+	
+	public void removerLinha(int linha)
+	{
+		livros.remove(linha);
+
+		fireTableDataChanged();
+	}
 
 	public void atualizarLista(List<Livro> lista)
 	{

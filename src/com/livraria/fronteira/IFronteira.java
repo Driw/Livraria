@@ -1,8 +1,6 @@
 package com.livraria.fronteira;
 
-import java.awt.event.ActionListener;
-
-public interface IFronteira extends ActionListener
+public interface IFronteira
 {
 	String getTitle();
 }

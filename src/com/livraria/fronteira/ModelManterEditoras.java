@@ -83,6 +83,13 @@ public class ModelManterEditoras extends DefaultTableModel
 	{
 		return editoras.get(linha);
 	}
+	
+	public void removerLinha(int linha)
+	{
+		editoras.remove(linha);
+
+		fireTableDataChanged();
+	}
 
 	public void atualizarLista(List<Editora> lista)
 	{

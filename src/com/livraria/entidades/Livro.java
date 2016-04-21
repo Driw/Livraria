@@ -1,4 +1,3 @@
-
 package com.livraria.entidades;
 
 import java.util.Date;

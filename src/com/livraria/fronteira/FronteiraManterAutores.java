@@ -33,6 +33,7 @@ import org.diverproject.util.MessageUtil;
 import com.livraria.controle.ControleAutor;
 import com.livraria.entidades.Autor;
 import com.livraria.util.ComponentUtil;
+import com.livraria.util.FronteiraException;
 
 @SuppressWarnings("serial")
 public class FronteiraManterAutores extends JPanel implements IFronteira
@@ -81,7 +82,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 		lblDataDeNascimento.setFont(Fronteira.FONT_COMPONENTES);
 		lblDataDeNascimento.setBounds(10, 53, 150, 25);
 		panelDados.add(lblDataDeNascimento);
-
+		
 		tfDataNascimento = new JFormattedTextField();
 		tfDataNascimento.setBounds(170, 55, 140, 25);
 		ComponentUtil.setDataMask(tfDataNascimento);
@@ -98,7 +99,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 		ComponentUtil.setDataMask(tfDataFalecimento);
 		panelDados.add(tfDataFalecimento);
 
-		JLabel lblLocalDaMorte = new JLabel("Possível Local da Morte :");
+		JLabel lblLocalDaMorte = new JLabel("Possï¿½vel Local da Morte :");
 		lblLocalDaMorte.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblLocalDaMorte.setFont(Fronteira.FONT_COMPONENTES);
 		lblLocalDaMorte.setBounds(10, 91, 150, 25);
@@ -125,7 +126,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 		panelDados.add(spBiografia);
 
 		JPanel panelDadosAcoes = new JPanel();
-		panelDadosAcoes.setBorder(new TitledBorder(null, "Ações", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelDadosAcoes.setBorder(new TitledBorder(null, "Aï¿½ï¿½es", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panelDadosAcoes.setBounds(660, 11, 150, 229);
 		panelDados.add(panelDadosAcoes);
 		panelDadosAcoes.setLayout(new GridLayout(5, 1, 0, 5));
@@ -239,7 +240,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 		panelConsulta.add(scrollPaneConsulta);
 
 		JPanel panelConsultaAcoes = new JPanel();
-		panelConsultaAcoes.setBorder(new TitledBorder(null, "Ações", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelConsultaAcoes.setBorder(new TitledBorder(null, "Aï¿½ï¿½es", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panelConsultaAcoes.setBounds(660, 11, 150, 167);
 		panelConsulta.add(panelConsultaAcoes);
 		panelConsultaAcoes.setLayout(new GridLayout(4, 1, 0, 5));
@@ -321,7 +322,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 			try {
 				nascimento = DateUtil.toDate(tfDataNascimento.getText());
 			} catch (ParseException e) {
-				throw new FronteiraException("Data de Nascimento: inválida");
+				throw new FronteiraException("Data de Nascimento: invï¿½lida");
 			}
 
 		if (tfDataFalecimento.getText().equals("__/__/____"))
@@ -330,7 +331,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 			try {
 				falecimento = DateUtil.toDate(tfDataFalecimento.getText());
 			} catch (ParseException e) {
-				throw new FronteiraException("Data de Falecimento: inválida");
+				throw new FronteiraException("Data de Falecimento: invï¿½lida");
 			}
 
 		String localDaMorte = tfLocalMorte.getText().length() == 0 ? null : tfLocalMorte.getText();
@@ -365,12 +366,12 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 
 			if (controleAutor.adicionar(autor))
 			{
-				MessageUtil.showInfo("Adicionar Autor", "Autor '%s' adicionado com êxtio!", autor.getNome());
+				MessageUtil.showInfo("Adicionar Autor", "Autor '%s' adicionado com ï¿½xtio!", autor.getNome());
 				callLimparCampos();
 			}
 
 			else
-				MessageUtil.showWarning("Adicionar Autor", "Não foi possível adicionar o autor '%s'.", autor.getNome());
+				MessageUtil.showWarning("Adicionar Autor", "Nï¿½o foi possï¿½vel adicionar o autor '%s'.", autor.getNome());
 
 		} catch (SQLException e) {
 			MessageUtil.showError("Adicionar Autor", "Falha ao adicionar o autor '%s'.\n- %s", autor.getNome(), e.getMessage());
@@ -391,12 +392,12 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 
 			if (controleAutor.atualizar(autor))
 			{
-				MessageUtil.showInfo("Atualizar Autor", "Autor '%s' atualizado com êxtio!", autor.getNome());
+				MessageUtil.showInfo("Atualizar Autor", "Autor '%s' atualizado com ï¿½xtio!", autor.getNome());
 				callLimparCampos();
 			}
 
 			else
-				MessageUtil.showWarning("Atualizar Autor", "Não foi possível atualizado o autor '%s'.", autor.getNome());
+				MessageUtil.showWarning("Atualizar Autor", "Nï¿½o foi possï¿½vel atualizado o autor '%s'.", autor.getNome());
 
 		} catch (ParseException e) {
 			MessageUtil.showWarning("Atualizar Autor", "Problema ao verificar datas.\n- %s", e.getMessage());
@@ -411,12 +412,12 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 
 			if (controleAutor.excluir(autor.getID()))
 			{
-				MessageUtil.showInfo("Excluir Autor", "Autor '%s' excluído com êxtio!", autor.getNome());
+				MessageUtil.showInfo("Excluir Autor", "Autor '%s' excluï¿½do com ï¿½xtio!", autor.getNome());
 				callLimparCampos();
 			}
 
 			else
-				MessageUtil.showWarning("Excluir Autor", "Não foi possível excluir o autor '%s'.", autor.getNome());
+				MessageUtil.showWarning("Excluir Autor", "Nï¿½o foi possï¿½vel excluir o autor '%s'.", autor.getNome());
 
 		} catch (SQLException e) {
 			MessageUtil.showError("Excluir Autor", "Falha ao excluir o autor '%s'.\n- %s", autor.getNome(), e.getMessage());
@@ -485,11 +486,11 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 				model.removerLinha(tableConsulta.getSelectedRow());
 				callLimparCampos();
 
-				MessageUtil.showInfo("Excluir Autor", "Autor '%s' excluído com êxito!", autor.getNome());
+				MessageUtil.showInfo("Excluir Autor", "Autor '%s' excluï¿½do com ï¿½xito!", autor.getNome());
 			}
 
 			else
-				MessageUtil.showWarning("Excluir Autor", "Não foi possível excluir o autor '%s'.", autor.getNome());
+				MessageUtil.showWarning("Excluir Autor", "Nï¿½o foi possï¿½vel excluir o autor '%s'.", autor.getNome());
 
 		} catch (SQLException e) {
 			MessageUtil.showError("Excluir Autor", "Falha ao excluir o autor '%s'.\n- %s", autor.getNome(), e.getMessage());

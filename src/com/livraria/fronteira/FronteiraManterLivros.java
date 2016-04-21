@@ -4,9 +4,15 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -18,20 +24,36 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
+import org.diverproject.util.DateUtil;
+import org.diverproject.util.MessageUtil;
+
+import com.livraria.controle.ControleLivro;
+import com.livraria.entidades.Livro;
+import com.livraria.util.ComponentUtil;
+import com.livraria.util.FronteiraException;
+
 @SuppressWarnings("serial")
 public class FronteiraManterLivros extends JPanel implements IFronteira
 {
+	private static final int FILTRO_TITULO = 0;
+	private static final int FILTRO_ISBN = 1;
+	private static final int FILTRO_RESUMO = 2;
+	private static final int FILTRO_SUMARIO = 3;
+	private static final int FILTRO_PRECO = 4;
 	private JTable tableConsulta;
 	private JTextField tfFiltro;
 	private JTextField tfISBN;
 	private JTextField tfTitulo;
-	private JTextField tfPreco;
-	private JTextField tfPublicacao;
+	private JFormattedTextField tfPreco;
+	private JFormattedTextField tfPublicacao;
 	private JTextField tfPaginas;
 	private JComboBox<String> cbCapa;
-	private JTextField tfPrecoCusto;
+	private JFormattedTextField tfPrecoCusto;
 	private JTextField tfMargemLucro;
-
+	private Livro livro;
+	private ControleLivro controleLivro = new ControleLivro();
+	private ModelManterLivros model = new ModelManterLivros();
+	
 	public FronteiraManterLivros()
 	{
 		setSize(850, 620);
@@ -49,7 +71,7 @@ public class FronteiraManterLivros extends JPanel implements IFronteira
 		add(panelDados);
 
 		JPanel panelDadosAcoes = new JPanel();
-		panelDadosAcoes.setBorder(new TitledBorder(null, "Ações", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelDadosAcoes.setBorder(new TitledBorder(null, "AÃ§Ãµes", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panelDadosAcoes.setBounds(660, 11, 150, 309);
 		panelDados.add(panelDadosAcoes);
 		panelDadosAcoes.setLayout(new GridLayout(5, 1, 0, 5));
@@ -80,7 +102,7 @@ public class FronteiraManterLivros extends JPanel implements IFronteira
 		tfISBN.setBounds(170, 12, 480, 25);
 		panelDados.add(tfISBN);
 
-		JLabel lblTitulo = new JLabel("Título :");
+		JLabel lblTitulo = new JLabel("TÃ­tulo :");
 		lblTitulo.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblTitulo.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblTitulo.setBounds(10, 47, 150, 25);
@@ -90,27 +112,29 @@ public class FronteiraManterLivros extends JPanel implements IFronteira
 		tfTitulo.setBounds(170, 48, 480, 25);
 		panelDados.add(tfTitulo);
 
-		JLabel lblPreco = new JLabel("Preço :");
+		JLabel lblPreco = new JLabel("PreÃ§o :");
 		lblPreco.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblPreco.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblPreco.setBounds(10, 84, 150, 25);
 		panelDados.add(lblPreco);
 
-		tfPreco = new JTextField();
+		tfPreco = new JFormattedTextField();
+		ComponentUtil.setValueMask(tfPreco);
 		tfPreco.setBounds(170, 85, 150, 25);
 		panelDados.add(tfPreco);
 
-		JLabel lblPublicacao = new JLabel("Publicação :");
+		JLabel lblPublicacao = new JLabel("PublicaÃ§Ã£o :");
 		lblPublicacao.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblPublicacao.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblPublicacao.setBounds(340, 84, 150, 25);
 		panelDados.add(lblPublicacao);
 
-		tfPublicacao = new JTextField();
+		tfPublicacao = new JFormattedTextField();
+		ComponentUtil.setDataMask(tfPublicacao);
 		tfPublicacao.setBounds(500, 84, 150, 25);
 		panelDados.add(tfPublicacao);
 
-		JLabel lblPaginas = new JLabel("Páginas :");
+		JLabel lblPaginas = new JLabel("PÃ¡ginas :");
 		lblPaginas.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblPaginas.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblPaginas.setBounds(10, 120, 150, 25);
@@ -132,13 +156,14 @@ public class FronteiraManterLivros extends JPanel implements IFronteira
 		cbCapa.addItem("Brochura");
 		panelDados.add(cbCapa);
 
-		JLabel lblPrecoCusto = new JLabel("Preço de Custo :");
+		JLabel lblPrecoCusto = new JLabel("PreÃ§o de Custo :");
 		lblPrecoCusto.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblPrecoCusto.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblPrecoCusto.setBounds(10, 157, 150, 25);
 		panelDados.add(lblPrecoCusto);
 
-		tfPrecoCusto = new JTextField();
+		tfPrecoCusto = new JFormattedTextField();
+		ComponentUtil.setValueMask(tfPrecoCusto);
 		tfPrecoCusto.setBounds(170, 158, 150, 25);
 		panelDados.add(tfPrecoCusto);
 
@@ -153,7 +178,7 @@ public class FronteiraManterLivros extends JPanel implements IFronteira
 		panelDados.add(tfMargemLucro);
 
 		JPanel panelConteudo = new JPanel();
-		panelConteudo.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Conteúdo Adicional", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		panelConteudo.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "ConteÃºdo Adicional", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		panelConteudo.setBounds(10, 193, 150, 127);
 		panelDados.add(panelConteudo);
 		panelConteudo.setLayout(new GridLayout(4, 1, 0, 5));
@@ -161,7 +186,7 @@ public class FronteiraManterLivros extends JPanel implements IFronteira
 		JButton btnResumo = new JButton("Resumo");
 		panelConteudo.add(btnResumo);
 
-		JButton btnSumario = new JButton("Sumário");
+		JButton btnSumario = new JButton("SumÃ¡rio");
 		panelConteudo.add(btnSumario);
 		
 		JButton btnAdicionarAutor = new JButton("Adicionar Autor");
@@ -227,13 +252,11 @@ public class FronteiraManterLivros extends JPanel implements IFronteira
 		JComboBox<String> cbFiltro = new JComboBox<String>();
 		cbFiltro.setBounds(505, 22, 145, 25);
 		cbFiltro.addItem("ISBN");
-		cbFiltro.addItem("Título");
+		cbFiltro.addItem("TÃ­tulo");
 		cbFiltro.addItem("Resumo");
-		cbFiltro.addItem("Sumário");
-		cbFiltro.addItem("Preço");
+		cbFiltro.addItem("SumÃ¡rio");
+		cbFiltro.addItem("PreÃ§o");
 		panelConsulta.add(cbFiltro);
-
-		ModelManterLivros model = new ModelManterLivros();
 
 		tableConsulta = new JTable();
 		tableConsulta.setModel(model);
@@ -263,7 +286,7 @@ public class FronteiraManterLivros extends JPanel implements IFronteira
 		panelConsulta.add(scrollPaneConsulta);
 
 		JPanel panelConsultaAcoes = new JPanel();
-		panelConsultaAcoes.setBorder(new TitledBorder(null, "Ações", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelConsultaAcoes.setBorder(new TitledBorder(null, "AÃ§Ãµes", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panelConsultaAcoes.setBounds(660, 11, 150, 167);
 		panelConsulta.add(panelConsultaAcoes);
 		panelConsultaAcoes.setLayout(new GridLayout(4, 1, 0, 5));
@@ -279,17 +302,282 @@ public class FronteiraManterLivros extends JPanel implements IFronteira
 		JButton btnConsultaVerAutores = new JButton("Ver Autores");
 		btnConsultaVerAutores.setFont(Fronteira.FONT_COMPONENTES);
 		panelConsultaAcoes.add(btnConsultaVerAutores);
+		
+		btnAdicionar.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callAdicionarLivro();
+			}
+		});
+		
+		btnAtualizar.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callAtualizarLivro();
+			}
+		});
+		
+		btnExcluir.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callExcluirLivro();
+			}
+		});
+		
+		btnLimpar.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callLimparCampos();
+			}
+		});
+		
+		btnResumo.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				callAdicionarResumo();
+			}
+		});
+		
+		btnSumario.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				callAdicionarSumario();
+			}
+		});
+		
+		btnAdicionarAutor.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				callAdicionarAutor();
+			}
+		});
+		
+		btnAdicionarCategoria.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				callAdicionarCategoria();
+			}
+		});
+		
+		btnConsultaSelecionar.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callConsultaSelecionar();
+			}
+		});
+		
+		btnConsultaExcluir.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callConsultaExcluir();
+			}
+		});
+		
+		btnConsultaVerAutores.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callConsultaVerAutores();
+			}
+		});
 	}
 
 	@Override
 	public String getTitle()
 	{
-		return "Manter Autores";
+		return "Manter Livros";
 	}
+	
+	private Livro criarLivro() throws FronteiraException
+	{
+		if (tfTitulo.getText().length() < 3)
+			throw new FronteiraException("Nome: nome muito curto");
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
+		Date publicacao;
+
+		if (tfPublicacao.getText().equals("__/__/____"))
+			publicacao = null;
+		else
+			try {
+				publicacao = DateUtil.toDate(tfPublicacao.getText());
+			} catch (ParseException e) {
+				throw new FronteiraException("Data de PublicaÃ§Ã£o: invÃ¡lida");
+			}
 		
+		String isbn = tfISBN.getText().length() == 0 ? null : tfISBN.getText();
+		int paginas = tfPaginas.getText().length() == 0 ? null : Integer.parseInt(tfPaginas.getText());
+		float preco = tfPreco.getText().length() == 0 ? null : Float.parseFloat(tfPreco.getText());
+		
+		
+		Livro livro = new Livro();
+		livro.setTitulo(tfTitulo.getText());
+		livro.setIsbn(isbn);
+		livro.setPreco(preco);
+		livro.setPublicacao(publicacao);
+		livro.setPaginas(paginas);
+		livro.setCapa(cbCapa.getSelectedIndex());
+
+		return livro;
+	}
+	
+	private void callAdicionarLivro()
+	{
+		try {
+			livro = criarLivro();
+
+			if (controleLivro.adicionar(livro))
+			{
+				MessageUtil.showInfo("Adicionar Livro", "Livro '%s' adicionado com exito!", livro.getTitulo());
+				callLimparCampos();
+			}
+
+			else
+				MessageUtil.showWarning("Adicionar Livro", "NÃ£o foi possÃ­vel adicionar o livro '%s'.", livro.getTitulo());
+
+		} catch (SQLException e) {
+			MessageUtil.showError("Adicionar Livro", "Falha ao adicionar o livro '%s'.\n- %s", livro.getTitulo(), e.getMessage());
+		} catch (FronteiraException e) {
+			MessageUtil.showError("Adicionar Livro", "Verifique o campo abaixo:\n- %s", livro.getTitulo(), e.getMessage());
+		}
+	}
+	
+	private void callAtualizarLivro()
+	{
+		try {
+
+			livro = criarLivro();
+
+			if (controleLivro.atualizar(livro))
+			{
+				MessageUtil.showInfo("Atualizar Livro", "Livro '%s' atualizado com exito!", livro.getTitulo());
+				callLimparCampos();
+			}
+
+			else
+				MessageUtil.showWarning("Atualizar Livro", "NÃ£o foi possÃ­vel atualizar o livro'%s'.", livro.getTitulo());
+
+		} catch (SQLException e) {
+			MessageUtil.showError("Atualizar Livro", "Falha ao atualizar a livro '%s'.\n- %s", livro.getTitulo(), e.getMessage());
+		} catch (FronteiraException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void callExcluirLivro()
+	{
+		try {
+
+			if (controleLivro.excluir(livro.getID()))
+			{
+				MessageUtil.showInfo("Excluir Livro", "Livro '%s' excluÃ­do com exito!", livro.getTitulo());
+				callLimparCampos();
+			}
+
+			else
+				MessageUtil.showWarning("Excluir Livro", "NÃ£o foi possÃ­vel excluir o livro '%s'.", livro.getTitulo());
+
+		} catch (SQLException e) {
+			MessageUtil.showError("Excluir Livro", "Falha ao excluir o livro '%s'.\n- %s", livro.getTitulo(), e.getMessage());
+		}
+	}
+	
+	private void callConsultaSelecionar()
+	{
+		livro = model.getLinha(tableConsulta.getSelectedRow());
+		tfTitulo.setText(livro.getTitulo());
+		tfISBN.setText(livro.getIsbn());
+		tfPreco.setText(String.valueOf(livro.getPreco()));
+		tfPublicacao.setText(livro.getPublicacao().toString());
+		tfPaginas.setText(String.valueOf(livro.getPaginas()));
+		cbCapa.setSelectedIndex(livro.getCapa());
+	}
+	
+	private void callConsultaExcluir()
+	{
+		try {
+
+			Livro livro = model.getLinha(tableConsulta.getSelectedRow());
+
+			if (controleLivro.excluir(livro.getID()))
+			{
+				model.removerLinha(tableConsulta.getSelectedRow());
+				callLimparCampos();
+
+				MessageUtil.showInfo("Excluir Livro", "Livro '%s' excluï¿½do com ï¿½xito!", livro.getTitulo());
+			}
+
+			else
+				MessageUtil.showWarning("Excluir Livro", "NÃ£o foi possÃ­vel excluir o livro '%s'.", livro.getTitulo());
+
+		} catch (SQLException e) {
+			MessageUtil.showError("Excluir Livro", "Falha ao excluir o livro '%s'.\n- %s", livro.getTitulo(), e.getMessage());
+		}
+	}
+	
+	private void callFiltro(String filtro, int filtroTipo)
+	{
+		try {
+			List<Livro> livros = null;
+
+			switch (filtroTipo)
+			{
+				case FILTRO_TITULO:
+					livros = controleLivro.filtrarPorTitulo(filtro);
+					break;
+
+				case FILTRO_ISBN:
+					livros = controleLivro.filtrarPorISBN(filtro);
+					break;
+
+				case FILTRO_RESUMO:
+					livros = controleLivro.filtrarPorResumo(filtro);
+					break;
+				case FILTRO_SUMARIO:
+					livros = controleLivro.filtrarPorSumario(filtro);
+					break;
+
+				case FILTRO_PRECO:
+//					livros = controleLivro.filtrarPorPreco(null, null);
+					break;
+			}
+
+			model.atualizarLista(livros);
+
+		} catch (SQLException e) {
+			MessageUtil.showError("Filtrar Livros", "Falha ao filtrar Livros.\n- %s", e.getMessage());
+		}
+	}
+	
+	private void callLimparCampos()
+	{
+		tfTitulo.setText("");
+		tfISBN.setText("");
+		tfFiltro.setText("");
+		tfPreco.setText("");
+		tfPublicacao.setText("");
+		tfPaginas.setText("");
+		tfPrecoCusto.setText("");
+		tfMargemLucro.setText("");
+		cbCapa.setSelectedIndex(0);
+		livro = null;
+		
+		livro = null;
 	}
 }

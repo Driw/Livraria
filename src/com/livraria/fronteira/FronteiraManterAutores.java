@@ -33,7 +33,6 @@ import org.diverproject.util.MessageUtil;
 import com.livraria.controle.ControleAutor;
 import com.livraria.entidades.Autor;
 import com.livraria.util.ComponentUtil;
-import com.livraria.util.FronteiraException;
 
 @SuppressWarnings("serial")
 public class FronteiraManterAutores extends JPanel implements IFronteira
@@ -42,6 +41,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 	private static final int FILTRO_BIOGRAFIA = 1;
 	private static final int FILTRO_LOCAL_DA_MORTE = 2;
 
+	private ControleAutor controleAutor;
 	private JTextField tfNome;
 	private JFormattedTextField tfDataNascimento;
 	private JFormattedTextField tfDataFalecimento;
@@ -50,13 +50,15 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 	private ModelManterAutores model;
 	private JTable tableConsulta;
 	private JTextField tfFiltro;
-	private ControleAutor controleAutor = new ControleAutor();
 	private JComboBox<String> cbFiltro;
 	private Autor autor;
+	private PopUpVerLivros popup;
 
 	@SuppressWarnings("deprecation")
 	public FronteiraManterAutores()
-	{		
+	{
+		controleAutor = new ControleAutor();
+
 		setSize(820, 460);
 		setLayout(null);
 
@@ -75,6 +77,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 		tfNome = new JTextField();
 		tfNome.setBounds(170, 19, 479, 25);
 		tfNome.addKeyListener(ComponentUtil.maxLength(tfNome, 48));
+		tfNome.setToolTipText("Nome pode ser parcial ou completo, deve ter de 3 a 48 caracteres.");
 		panelDados.add(tfNome);
 
 		JLabel lblDataDeNascimento = new JLabel("Data de Nascimento :");
@@ -82,9 +85,10 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 		lblDataDeNascimento.setFont(Fronteira.FONT_COMPONENTES);
 		lblDataDeNascimento.setBounds(10, 53, 150, 25);
 		panelDados.add(lblDataDeNascimento);
-		
+
 		tfDataNascimento = new JFormattedTextField();
 		tfDataNascimento.setBounds(170, 55, 140, 25);
+		tfDataNascimento.setToolTipText("Se não houver data de nascimento deixar em branco ou com zeros: 00/00/0000.");
 		ComponentUtil.setDataMask(tfDataNascimento);
 		panelDados.add(tfDataNascimento);
 
@@ -96,10 +100,11 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 
 		tfDataFalecimento = new JFormattedTextField();
 		tfDataFalecimento.setBounds(509, 55, 140, 25);
+		tfDataFalecimento.setToolTipText("Deixar com 00/00/0000 se estiver vivo ou se não souber data da morte.");
 		ComponentUtil.setDataMask(tfDataFalecimento);
 		panelDados.add(tfDataFalecimento);
 
-		JLabel lblLocalDaMorte = new JLabel("Possï¿½vel Local da Morte :");
+		JLabel lblLocalDaMorte = new JLabel("Possível Local da Morte :");
 		lblLocalDaMorte.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblLocalDaMorte.setFont(Fronteira.FONT_COMPONENTES);
 		lblLocalDaMorte.setBounds(10, 91, 150, 25);
@@ -108,6 +113,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 		tfLocalMorte = new JTextField();
 		tfLocalMorte.setBounds(170, 92, 479, 25);
 		tfLocalMorte.addKeyListener(ComponentUtil.maxLength(tfLocalMorte, 32));
+		tfLocalMorte.setToolTipText("Local da morte deve ser especificado com nome de cidade e/ou país, limite de 32 caracteres.");
 		panelDados.add(tfLocalMorte);
 
 		JLabel lblBiografia = new JLabel("Biografia :");
@@ -120,16 +126,18 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 		tfBiografia.setLineWrap(true);
 		tfBiografia.setTabSize(4);
 		tfBiografia.addKeyListener(ComponentUtil.maxLength(tfBiografia, 512));
+		tfBiografia.setToolTipText("A biografia deve contrar um pouco sobre a história/trabalhos do autor, limite de 512 caracteres.");
 
 		JScrollPane spBiografia = new JScrollPane(tfBiografia);
 		spBiografia.setBounds(170, 127, 479, 113);
 		panelDados.add(spBiografia);
 
 		JPanel panelDadosAcoes = new JPanel();
-		panelDadosAcoes.setBorder(new TitledBorder(null, "Aï¿½ï¿½es", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelDadosAcoes.setBorder(new TitledBorder(null, "Ações", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panelDadosAcoes.setBounds(660, 11, 150, 229);
-		panelDados.add(panelDadosAcoes);
 		panelDadosAcoes.setLayout(new GridLayout(5, 1, 0, 5));
+		panelDadosAcoes.setToolTipText("As ações abaixos serão aplicas apenas em relação aos dados preenchidos nos campos.");
+		panelDados.add(panelDadosAcoes);
 
 		JButton btnAdicionar = new JButton("Adicionar");
 		btnAdicionar.setFont(Fronteira.FONT_COMPONENTES);
@@ -141,6 +149,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 				callAdicionarAutor();
 			}
 		});
+		btnAdicionar.setToolTipText("Adicionar irá registrar um novo autor com as informações abaixo.");
 		panelDadosAcoes.add(btnAdicionar);
 
 		JButton btnAtualizar = new JButton("Atualizar");
@@ -240,7 +249,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 		panelConsulta.add(scrollPaneConsulta);
 
 		JPanel panelConsultaAcoes = new JPanel();
-		panelConsultaAcoes.setBorder(new TitledBorder(null, "Aï¿½ï¿½es", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelConsultaAcoes.setBorder(new TitledBorder(null, "Ações", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panelConsultaAcoes.setBounds(660, 11, 150, 167);
 		panelConsulta.add(panelConsultaAcoes);
 		panelConsultaAcoes.setLayout(new GridLayout(4, 1, 0, 5));
@@ -311,28 +320,40 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 
 	private Autor criarAutor() throws FronteiraException
 	{
+		if (tfNome.getText().length() == 0)
+			throw new FronteiraException("Nome: em branco.");
+
 		if (tfNome.getText().length() < 3)
-			throw new FronteiraException("Nome: nome muito curto");
+			throw new FronteiraException("Nome: mínimo de 3 caracteres.");
+
+		if (tfNome.getText().length() > 48)
+			throw new FronteiraException("Nome: limite de 48 caracteres.");
 
 		Date nascimento, falecimento;
 
-		if (tfDataNascimento.getText().equals("__/__/____"))
+		if (tfDataNascimento.getText().equals("  /  /    ") || tfDataNascimento.getText().equals("00/00/0000"))
 			nascimento = null;
 		else
 			try {
 				nascimento = DateUtil.toDate(tfDataNascimento.getText());
 			} catch (ParseException e) {
-				throw new FronteiraException("Data de Nascimento: invï¿½lida");
+				throw new FronteiraException("Data de Nascimento: inválida");
 			}
 
-		if (tfDataFalecimento.getText().equals("__/__/____"))
+		if (tfDataFalecimento.getText().equals("  /  /    ") || tfDataFalecimento.getText().equals("00/00/0000"))
 			falecimento = null;
 		else
 			try {
 				falecimento = DateUtil.toDate(tfDataFalecimento.getText());
 			} catch (ParseException e) {
-				throw new FronteiraException("Data de Falecimento: invï¿½lida");
+				throw new FronteiraException("Data de Falecimento: inválida");
 			}
+
+		if (tfLocalMorte.getText().length() > 32)
+			throw new FronteiraException("Possível Morte: limite de 32 caracteres.");
+
+		if (tfBiografia.getText().length() > 512)
+			throw new FronteiraException("Biografia: limite de 512 caracteres.");
 
 		String localDaMorte = tfLocalMorte.getText().length() == 0 ? null : tfLocalMorte.getText();
 		String biografia = tfBiografia.getText().length() == 0 ? null : tfBiografia.getText();
@@ -364,19 +385,23 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 
 			autor = criarAutor();
 
+			if (controleAutor.existe(autor.getNome()))
+				if (!MessageUtil.showYesNo("Adicionar Autor", "Aturo '%s' já existente, adicionar mesmo assim?", autor.getNome()))
+					return;
+
 			if (controleAutor.adicionar(autor))
 			{
-				MessageUtil.showInfo("Adicionar Autor", "Autor '%s' adicionado com ï¿½xtio!", autor.getNome());
+				MessageUtil.showInfo("Adicionar Autor", "Autor '%s' adicionado com êxtio!", autor.getNome());
 				callLimparCampos();
 			}
 
 			else
-				MessageUtil.showWarning("Adicionar Autor", "Nï¿½o foi possï¿½vel adicionar o autor '%s'.", autor.getNome());
+				MessageUtil.showWarning("Adicionar Autor", "Não foi possível adicionar o autor '%s'.", autor.getNome());
 
 		} catch (SQLException e) {
 			MessageUtil.showError("Adicionar Autor", "Falha ao adicionar o autor '%s'.\n- %s", autor.getNome(), e.getMessage());
 		} catch (FronteiraException e) {
-			MessageUtil.showError("Adicionar Autor", "Verifique o campo abaixo:\n- %s", autor.getNome(), e.getMessage());
+			MessageUtil.showError("Adicionar Autor", "Verifique o campo abaixo:\n- %s", e.getMessage());
 		}
 	}
 
@@ -384,23 +409,24 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 	{
 		try {
 
-			autor.setNome(tfNome.getText());
-			autor.setNascimento(DateUtil.toDate(tfDataNascimento.getText()));
-			autor.setFalecimento(DateUtil.toDate(tfDataFalecimento.getText()));
-			autor.setLocalMorte(tfLocalMorte.getText());
-			autor.setBiografia(tfBiografia.getText());
+			Autor autorConsultado = autor;
+
+			autor = criarAutor();
+			autor.setID(autorConsultado.getID());
 
 			if (controleAutor.atualizar(autor))
 			{
-				MessageUtil.showInfo("Atualizar Autor", "Autor '%s' atualizado com ï¿½xtio!", autor.getNome());
+				autorConsultado.copiar(autor);
+
+				MessageUtil.showInfo("Atualizar Autor", "Autor '%s' atualizado com êxtio!", autor.getNome());
 				callLimparCampos();
 			}
 
 			else
-				MessageUtil.showWarning("Atualizar Autor", "Nï¿½o foi possï¿½vel atualizado o autor '%s'.", autor.getNome());
+				MessageUtil.showWarning("Atualizar Autor", "Não foi possível atualizado o autor '%s'.", autor.getNome());
 
-		} catch (ParseException e) {
-			MessageUtil.showWarning("Atualizar Autor", "Problema ao verificar datas.\n- %s", e.getMessage());
+		} catch (FronteiraException e) {
+			MessageUtil.showWarning("Atualizar Autor", "Falha ao atualizar autor:\n- %s", e.getMessage());
 		} catch (SQLException e) {
 			MessageUtil.showError("Atualizar Autor", "Falha ao atualizar o autor '%s'.\n- %s", autor.getNome(), e.getMessage());
 		}
@@ -412,12 +438,14 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 
 			if (controleAutor.excluir(autor.getID()))
 			{
-				MessageUtil.showInfo("Excluir Autor", "Autor '%s' excluï¿½do com ï¿½xtio!", autor.getNome());
+				model.remover(autor);
+
+				MessageUtil.showInfo("Excluir Autor", "Autor '%s' excluído com êxtio!", autor.getNome());
 				callLimparCampos();
 			}
 
 			else
-				MessageUtil.showWarning("Excluir Autor", "Nï¿½o foi possï¿½vel excluir o autor '%s'.", autor.getNome());
+				MessageUtil.showWarning("Excluir Autor", "Não foi possível excluir o autor '%s'.", autor.getNome());
 
 		} catch (SQLException e) {
 			MessageUtil.showError("Excluir Autor", "Falha ao excluir o autor '%s'.\n- %s", autor.getNome(), e.getMessage());
@@ -470,7 +498,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 
 		tfNome.setText(autor.getNome());
 		tfDataNascimento.setText(DateUtil.toString(autor.getNascimento()));
-		tfDataFalecimento.setText(DateUtil.toString(autor.getNascimento()));
+		tfDataFalecimento.setText(DateUtil.toString(autor.getFalecimento()));
 		tfLocalMorte.setText(autor.getLocalMorte());
 		tfBiografia.setText(autor.getBiografia());
 	}
@@ -486,11 +514,11 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 				model.removerLinha(tableConsulta.getSelectedRow());
 				callLimparCampos();
 
-				MessageUtil.showInfo("Excluir Autor", "Autor '%s' excluï¿½do com ï¿½xito!", autor.getNome());
+				MessageUtil.showInfo("Excluir Autor", "Autor '%s' excluído com êxito!", autor.getNome());
 			}
 
 			else
-				MessageUtil.showWarning("Excluir Autor", "Nï¿½o foi possï¿½vel excluir o autor '%s'.", autor.getNome());
+				MessageUtil.showWarning("Excluir Autor", "Não foi possível excluir o autor '%s'.", autor.getNome());
 
 		} catch (SQLException e) {
 			MessageUtil.showError("Excluir Autor", "Falha ao excluir o autor '%s'.\n- %s", autor.getNome(), e.getMessage());
@@ -499,6 +527,17 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 
 	private void callVerLivros()
 	{
-		// TODO Ver Livros
+		Autor autor = model.getLinha(tableConsulta.getSelectedRow());
+
+		if (autor == null)
+		{
+			MessageUtil.showInfo("Ver Livros", "Selecione um autor na consulta!");
+			return;
+		}
+
+		if (popup == null)
+			popup = new PopUpVerLivros(this);
+
+		popup.carregar(autor);
 	}
 }

@@ -50,8 +50,14 @@ public class ControleAutor
 
 	public boolean atualizar(Autor autor) throws SQLException
 	{
-		Date nascimento = new Date(autor.getNascimento().getTime());
-		Date falecimento = new Date(autor.getFalecimento().getTime());
+		Date nascimento = null;
+		Date falecimento = null;
+
+		if (autor.getNascimento() != null)
+			nascimento = new Date(autor.getNascimento().getTime());
+
+		if (autor.getFalecimento() != null)
+			falecimento = new Date(autor.getFalecimento().getTime());
 
 		String sql = "UPDATE autores SET nome = ?, nascimento = ?, falecimento = ?,"
 					+" local_morte = ?, biografia = ? WHERE id = ?";
@@ -154,11 +160,17 @@ public class ControleAutor
 
 		return autores;
 	}
-	
-	public int getId(String nome) throws SQLException {
-		PreparedStatement ps = connection.prepareStatement("SELECT id FROM autores WHERE nome LIKE '%?%'");
+
+	public boolean existe(String nome) throws SQLException
+	{
+		String sql = "SELECT COUNT(*) as count FROM autores WHERE nome = ?";
+
+		PreparedStatement ps = connection.prepareStatement(sql);
 		ps.setString(1, nome);
+
 		ResultSet rs = ps.executeQuery();
-		return rs.getInt("id");
+		rs.next();
+
+		return rs.getInt("count") != 0;
 	}
 }

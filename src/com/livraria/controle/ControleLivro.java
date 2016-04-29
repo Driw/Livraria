@@ -309,6 +309,21 @@ public class ControleLivro
 		return concluirFiltragem(rs);
 	}
 
+	public List<Livro> filtrarPorAutor(Autor autor) throws SQLException
+	{
+		String sql = "SELECT * FROM livros "
+					+"INNER JOIN livros_autores ON livros.id = livros_autores.livro "
+					+"INNER JOIN autores ON livros_autores.autor = autores.id "
+					+ "WHERE autores.id = ?";
+
+		PreparedStatement ps = connection.prepareStatement(sql);
+		ps.setInt(1, autor.getID());
+
+		ResultSet rs = ps.executeQuery();
+
+		return concluirFiltragem(rs);
+	}
+
 	private List<Livro> concluirFiltragem(ResultSet rs) throws SQLException
 	{
 		List<Livro> livros = new ArrayList<Livro>();

@@ -63,8 +63,12 @@ public class ModelManterAutores extends DefaultTableModel
 			switch (column)
 			{
 				case COLUNA_NOME: return autor.getNome();
-				case COLUNA_NASCIMENTO: return DateUtil.toString(autor.getNascimento());
-				case COLUNA_FALECIMENTO: return DateUtil.toString(autor.getFalecimento());
+				case COLUNA_NASCIMENTO:
+					return autor.getNascimento() == null ? "-" : DateUtil.toString(autor.getNascimento());
+
+				case COLUNA_FALECIMENTO:
+					return autor.getFalecimento() == null ? "-" : DateUtil.toString(autor.getFalecimento());
+
 				case COLUNA_LOCAL_MORTE: return autor.getLocalMorte();
 				case COLUNA_BIOGRAFIA:
 					if (autor.getBiografia() == null)
@@ -85,7 +89,10 @@ public class ModelManterAutores extends DefaultTableModel
 
 	public Autor getLinha(int linha)
 	{
-		return autores.get(linha);
+		if (linha >= 0 && linha < autores.size())
+			return autores.get(linha);
+
+		return null;
 	}
 
 	public void removerLinha(int linha)
@@ -100,5 +107,17 @@ public class ModelManterAutores extends DefaultTableModel
 		autores = lista;
 
 		fireTableDataChanged();
+	}
+
+	public void remover(Autor autor)
+	{
+		for (int i = 0; i < autores.size(); i++)
+			if (autores.get(i).equals(autor))
+			{
+				autores.remove(i);
+				fireTableDataChanged();
+
+				return;
+			}
 	}
 }

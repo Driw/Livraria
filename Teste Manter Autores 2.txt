@@ -1,0 +1,13 @@
+1-o campo mes nascimento e mes falecimento  nao esta buscando e nem add no campo abaixo corretamente
+porem no banco de dados esta sendo adicionado corretamente
+o problema 
+
+
+
+2- quando algum autor é atualizado ele decrementa o ultimo digito para a data do falecimento 
+e data de nascimento 
+
+
+3-As datas permitem adicionar datas de dias que nao existem
+exemplo dia 40 ou mes 30, na parte dos anos podem deixar livre 
+pois pode ser um livro muito muito antigo 

@@ -1,5 +1,7 @@
 package com.livraria.entidades;
 
+import java.util.Date;
+
 public class Categoria
 {
 	private int id;
@@ -34,5 +36,12 @@ public class Categoria
 	public void setTema(String tema)
 	{
 		this.tema = tema;
+	}
+	
+	public void copiar(Categoria categoria)
+	{
+		this.id = categoria.id;
+		this.codigo = categoria.codigo;
+		this.tema = categoria.tema;
 	}
 }

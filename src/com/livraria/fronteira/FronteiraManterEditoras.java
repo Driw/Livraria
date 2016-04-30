@@ -4,6 +4,8 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Date;
@@ -36,32 +38,39 @@ public class FronteiraManterEditoras extends JPanel implements IFronteira
 	private static final int FILTRO_NOME = 0;
 	private static final int FILTRO_ENDERECO = 1;
 	private static final int FILTRO_TELEFONE = 2;
+
+	private ModelManterEditoras model;
+	private ControleEditora controleEditora;
+	private Editora editora;
+
 	private JTextField tfNome;
 	private JFormattedTextField tfCnpj;
 	private JTextField tfEndereco;
 	private JFormattedTextField tfTelefone;
-	private JTable tabelaConsulta;
 	private JFormattedTextField tfContratoInicio;
 	private JFormattedTextField tfContratoFim;
-	private JTextField tfFiltro;
-	private ControleEditora controleEditora = new ControleEditora();
-	private ModelManterEditoras model;
-	private JComboBox<String> cbFiltro;
-	private Editora editora;
 
+	private JTextField tfFiltro;
+	private JComboBox<String> cbFiltro;
+	private JTable tableConsulta;
+
+	private PopUpVerLivros popup;
+
+	private JButton btnAdicionar;
+	private JButton btnAtualizar;
+	private JButton btnExcluir;
+
+	@SuppressWarnings("deprecation")
 	public FronteiraManterEditoras()
 	{
-		setSize(850, 540);
+		controleEditora = new ControleEditora();
 
-		JLabel lblGerenciarEditoras = new JLabel("GERENCIAR EDITORAS");
-		lblGerenciarEditoras.setHorizontalAlignment(SwingConstants.CENTER);
-		lblGerenciarEditoras.setFont(Fronteira.FONT_TITULO);
-		lblGerenciarEditoras.setBounds(20, 11, 795, 33);
-		add(lblGerenciarEditoras);
+		setSize(820, 460);
+		setLayout(null);
 
 		JPanel panelDados = new JPanel();
 		panelDados.setBorder(new TitledBorder(null, "Dados", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panelDados.setBounds(20, 55, 820, 251);
+		panelDados.setBounds(0, 0, 820, 251);
 		panelDados.setLayout(null);
 		add(panelDados);
 
@@ -73,6 +82,7 @@ public class FronteiraManterEditoras extends JPanel implements IFronteira
 
 		tfNome = new JTextField();
 		tfNome.setBounds(170, 43, 480, 25);
+		tfNome.setToolTipText("O nome da editra deve conter entre 3 a 32 caracteres sendo obrigatório.");
 		panelDados.add(tfNome);
 
 		JLabel lblCnpj = new JLabel("CNPJ :");
@@ -82,11 +92,12 @@ public class FronteiraManterEditoras extends JPanel implements IFronteira
 		panelDados.add(lblCnpj);
 
 		tfCnpj = new JFormattedTextField();
-		ComponentUtil.setCnpjMask(tfCnpj);
 		tfCnpj.setBounds(170, 84, 480, 25);
+		tfCnpj.setToolTipText("CNPJ é composto por 14 dítigos e será verificado a sua validada.");
+		ComponentUtil.setCnpjMask(tfCnpj);
 		panelDados.add(tfCnpj);
 
-		JLabel lblEndereo = new JLabel("Endereï¿½o :");
+		JLabel lblEndereo = new JLabel("Endereço :");
 		lblEndereo.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblEndereo.setFont(Fronteira.FONT_COMPONENTES);
 		lblEndereo.setBounds(10, 121, 150, 25);
@@ -94,6 +105,7 @@ public class FronteiraManterEditoras extends JPanel implements IFronteira
 
 		tfEndereco = new JTextField();
 		tfEndereco.setBounds(170, 122, 480, 25);
+		tfEndereco.setToolTipText("Endereço é um campo opicional e deve conter entre 3 a 48 caracteres.");
 		panelDados.add(tfEndereco);
 
 		JLabel lblTelefone = new JLabel("Telefone :");
@@ -103,8 +115,9 @@ public class FronteiraManterEditoras extends JPanel implements IFronteira
 		panelDados.add(lblTelefone);
 
 		tfTelefone = new JFormattedTextField();
-		ComponentUtil.setFoneMask(tfTelefone);
 		tfTelefone.setBounds(170, 158, 170, 25);
+		tfTelefone.setToolTipText("Telefone é um campo opicional e deve conter apenas núneros, se não houver DD usar 00.");
+		ComponentUtil.setFoneMask(tfTelefone);
 		panelDados.add(tfTelefone);
 
 		JLabel lblContrato = new JLabel("Contrato :");
@@ -114,50 +127,90 @@ public class FronteiraManterEditoras extends JPanel implements IFronteira
 		panelDados.add(lblContrato);
 
 		tfContratoInicio = new JFormattedTextField();
-		ComponentUtil.setDataMask(tfContratoInicio);
 		tfContratoInicio.setBounds(170, 194, 170, 25);
+		tfContratoInicio.setToolTipText("Usar apenas se houver contrato, a data inicial deve ser antes da final.");
+		ComponentUtil.setDataMask(tfContratoInicio);
 		panelDados.add(tfContratoInicio);
 
-		tfContratoFim = new JFormattedTextField();
-		ComponentUtil.setDataMask(tfContratoFim);
-		tfContratoFim.setBounds(400, 194, 170, 25);
-		panelDados.add(tfContratoFim);
-
-		JLabel lblContratoAte = new JLabel("atï¿½");
+		JLabel lblContratoAte = new JLabel("até");
 		lblContratoAte.setHorizontalAlignment(SwingConstants.CENTER);
 		lblContratoAte.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblContratoAte.setBounds(350, 193, 40, 25);
 		panelDados.add(lblContratoAte);
 
+		tfContratoFim = new JFormattedTextField();
+		tfContratoFim.setBounds(400, 194, 170, 25);
+		tfContratoFim.setToolTipText("Usar apenas se houver contrato, a data final deve ser após a do inicio.");
+		ComponentUtil.setDataMask(tfContratoFim);
+		panelDados.add(tfContratoFim);
+
 		JPanel panelDadosAcoes = new JPanel();
-		panelDadosAcoes.setBorder(new TitledBorder(null, "Aï¿½ï¿½es", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelDadosAcoes.setBorder(new TitledBorder(null, "Ações", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panelDadosAcoes.setBounds(660, 11, 150, 229);
-		panelDados.add(panelDadosAcoes);
 		panelDadosAcoes.setLayout(new GridLayout(5, 1, 0, 5));
+		panelDados.add(panelDadosAcoes);
+
+		btnAdicionar = new JButton("Adicionar");
+		btnAdicionar.setFont(Fronteira.FONT_COMPONENTES);
+		btnAdicionar.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callAdicionarEditora();
+			}
+		});
+		btnAdicionar.setToolTipText("Adicionar irá registrar um nova editora com as informações abaixo.");
+		panelDadosAcoes.add(btnAdicionar);
+
+		btnAtualizar = new JButton("Atualizar");
+		btnAtualizar.setEnabled(false);
+		btnAtualizar.setFont(Fronteira.FONT_COMPONENTES);
+		btnAtualizar.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callAtualizarEditora();
+			}
+		});
+		btnAtualizar.setToolTipText("Atualizar só irá funcionar se houver uma editora selecionado da cosulta.");
+		panelDadosAcoes.add(btnAtualizar);
+
+		btnExcluir = new JButton("Excluir");
+		btnExcluir.setEnabled(false);
+		btnExcluir.setFont(Fronteira.FONT_COMPONENTES);
+		btnExcluir.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callExcluirEditora();
+			}
+		});
+		btnExcluir.setToolTipText("Essa opção de excluir só irá funcionar se houver uma editora selecionado da consulta.");
+		panelDadosAcoes.add(btnExcluir);
 
 		JButton btnLimpar = new JButton("Limpar");
 		btnLimpar.setFont(Fronteira.FONT_COMPONENTES);
+		btnLimpar.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callLimparCampos();
+			}
+		});
+		btnLimpar.setToolTipText("Limpa todos os campos relacionado aos dados da editora e desseleciona o autor se houver um selecionado.");
 		panelDadosAcoes.add(btnLimpar);
 
-		JButton btnAdicionar = new JButton("Adicionar");
-		btnAdicionar.setFont(Fronteira.FONT_COMPONENTES);
-		panelDadosAcoes.add(btnAdicionar);
-
-		JButton btnAtualizar = new JButton("Atualizar");
-		btnAtualizar.setFont(Fronteira.FONT_COMPONENTES);
-		panelDadosAcoes.add(btnAtualizar);
-
-		JButton btnExcluir = new JButton("Excluir");
-		btnExcluir.setFont(Fronteira.FONT_COMPONENTES);
-		panelDadosAcoes.add(btnExcluir);
-
 		JSeparator separator = new JSeparator();
-		separator.setBounds(0, 317, getWidth(), 12);
+		separator.setBounds(0, 262, getWidth(), 12);
 		add(separator);
 
 		JPanel panelConsulta = new JPanel();
 		panelConsulta.setBorder(new TitledBorder(null, "Consulta", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panelConsulta.setBounds(20, 332, 820, 186);
+		panelConsulta.setBounds(0, 274, 820, 186);
 		panelConsulta.setLayout(null);
 		add(panelConsulta);
 
@@ -169,120 +222,96 @@ public class FronteiraManterEditoras extends JPanel implements IFronteira
 
 		tfFiltro = new JTextField();
 		tfFiltro.setBounds(100, 22, 395, 25);
+		tfFiltro.addKeyListener(new KeyAdapter()
+		{
+			@Override
+			public void keyReleased(KeyEvent e)
+			{
+				callFiltrar(tfFiltro.getText(), cbFiltro.getSelectedIndex());
+			}
+		});
+		tfFiltro.setToolTipText("Conforme digitado algo irá consultar o banco de dados editoras de acordo com o filtro selecionado.");
 		panelConsulta.add(tfFiltro);
 
 		cbFiltro = new JComboBox<String>();
 		cbFiltro.setBounds(505, 22, 145, 25);
 		cbFiltro.addItem("Nome");
-		cbFiltro.addItem("Endereï¿½o");
+		cbFiltro.addItem("Endereço");
 		cbFiltro.addItem("Telefone");
+		cbFiltro.setToolTipText("Filtro irá indicar qual a informação da editora que será escolhida como resultado de busca.");
 		panelConsulta.add(cbFiltro);
 
 		model = new ModelManterEditoras();
 
-		tabelaConsulta = new JTable();
-		tabelaConsulta.setModel(model);
-		tabelaConsulta.getColumnModel().getColumn(0).setResizable(false);
-		tabelaConsulta.getColumnModel().getColumn(0).setMinWidth(240);
-		tabelaConsulta.getColumnModel().getColumn(0).setMaxWidth(240);
-		tabelaConsulta.getColumnModel().getColumn(1).setResizable(false);
-		tabelaConsulta.getColumnModel().getColumn(1).setMinWidth(130);
-		tabelaConsulta.getColumnModel().getColumn(1).setMaxWidth(130);
-		tabelaConsulta.getColumnModel().getColumn(2).setResizable(false);
-		tabelaConsulta.getColumnModel().getColumn(2).setMinWidth(120);
-		tabelaConsulta.getColumnModel().getColumn(2).setMaxWidth(120);
-		tabelaConsulta.getColumnModel().getColumn(3).setResizable(false);
-		tabelaConsulta.getColumnModel().getColumn(3).setMinWidth(150);
-		tabelaConsulta.getColumnModel().getColumn(3).setMaxWidth(150);
-		tabelaConsulta.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		tabelaConsulta.setRowSelectionAllowed(false);
+		tableConsulta = new JTable();
+		tableConsulta.setModel(model);
+		tableConsulta.getColumnModel().getColumn(0).setResizable(false);
+		tableConsulta.getColumnModel().getColumn(0).setMinWidth(240);
+		tableConsulta.getColumnModel().getColumn(0).setMaxWidth(240);
+		tableConsulta.getColumnModel().getColumn(1).setResizable(false);
+		tableConsulta.getColumnModel().getColumn(1).setMinWidth(130);
+		tableConsulta.getColumnModel().getColumn(1).setMaxWidth(130);
+		tableConsulta.getColumnModel().getColumn(2).setResizable(false);
+		tableConsulta.getColumnModel().getColumn(2).setMinWidth(120);
+		tableConsulta.getColumnModel().getColumn(2).setMaxWidth(120);
+		tableConsulta.getColumnModel().getColumn(3).setResizable(false);
+		tableConsulta.getColumnModel().getColumn(3).setMinWidth(150);
+		tableConsulta.getColumnModel().getColumn(3).setMaxWidth(150);
+		tableConsulta.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tableConsulta.setRowSelectionAllowed(true);
+		tableConsulta.setToolTipText("Tabela contendo todas as editoras encontrados de acordo com a filtragem escolhida.");
 
-		JScrollPane scrollPaneConsulta = new JScrollPane(tabelaConsulta);
+		JScrollPane scrollPaneConsulta = new JScrollPane(tableConsulta);
 		scrollPaneConsulta.setBounds(10, 57, 640, 118);
 		panelConsulta.add(scrollPaneConsulta);
 
 		JPanel panelConsultaAcoes = new JPanel();
-		panelConsultaAcoes.setBorder(new TitledBorder(null, "Aï¿½ï¿½es", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelConsultaAcoes.setBorder(new TitledBorder(null, "Ações", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panelConsultaAcoes.setBounds(660, 11, 150, 167);
 		panelConsulta.add(panelConsultaAcoes);
 		panelConsultaAcoes.setLayout(new GridLayout(4, 1, 0, 5));
 
+		JButton btnVerTodos = new JButton("Ver Todos");
+		btnVerTodos.setFont(Fronteira.FONT_COMPONENTES);
+		btnVerTodos.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callVerTodos();
+			}
+		});
+		btnVerTodos.setToolTipText("Essa opção irá buscar todas as editoras existentes no banco dedados.");
+		panelConsultaAcoes.add(btnVerTodos);
+
 		JButton btnConsultaSelecionar = new JButton("Selecionar");
 		btnConsultaSelecionar.setFont(Fronteira.FONT_COMPONENTES);
+		btnConsultaSelecionar.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callSelecionarEditora();
+			}
+		});
+		btnConsultaSelecionar.setToolTipText("Puxa os dados da editora selecionado na consulta para os campos, permitindo atualizar ou excluir.");
 		panelConsultaAcoes.add(btnConsultaSelecionar);
 
 		JButton btnConsultaExcluir = new JButton("Excluir");
 		btnConsultaExcluir.setFont(Fronteira.FONT_COMPONENTES);
+		btnConsultaExcluir.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callExcluirEditoraDireto();
+			}
+		});
+		btnConsultaExcluir.setToolTipText("Permite excluir uma editora que esteja selecionado na tabela de consulta.");
 		panelConsultaAcoes.add(btnConsultaExcluir);
 
 		JButton btnConsultaVerLivros = new JButton("Ver Livros");
 		btnConsultaVerLivros.setFont(Fronteira.FONT_COMPONENTES);
-		panelConsultaAcoes.add(btnConsultaVerLivros);
-
-		btnAdicionar.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				callAdicionarEditora();
-			}
-		});
-
-		btnAtualizar.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				callAtualizarEditora();
-			}
-		});
-
-		btnConsultaExcluir.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				callExcluirEditora();
-			}
-		});
-
-		btnLimpar.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				callLimparCampos();
-			}
-		});
-
-		btnConsultaSelecionar.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				callFiltro(tfFiltro.getText(), cbFiltro.getSelectedIndex());
-
-			}
-		});
-		
-		btnConsultaSelecionar.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				callConsultaSelecionar();
-			}
-		});
-		
-		btnConsultaExcluir.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				callConsultaExcluir();
-			}
-		});
-		
 		btnConsultaVerLivros.addActionListener(new ActionListener()
 		{
 			@Override
@@ -291,6 +320,18 @@ public class FronteiraManterEditoras extends JPanel implements IFronteira
 				callVerLivros();
 			}
 		});
+		btnConsultaVerLivros.setToolTipText("Ao clicar uma nova tela irá abrir listando todos os livros da editora selecionado na consulta.");
+		panelConsultaAcoes.add(btnConsultaVerLivros);
+
+		tfNome.setNextFocusableComponent(tfCnpj);
+		tfCnpj.setNextFocusableComponent(tfEndereco);
+		tfEndereco.setNextFocusableComponent(tfTelefone);
+		tfTelefone.setNextFocusableComponent(tfContratoInicio);
+		tfContratoInicio.setNextFocusableComponent(tfContratoFim);
+		tfContratoFim.setNextFocusableComponent(btnAdicionar);
+		btnAdicionar.setNextFocusableComponent(btnAtualizar);
+		btnAtualizar.setNextFocusableComponent(btnExcluir);
+		btnExcluir.setNextFocusableComponent(btnLimpar);
 	}
 
 	@Override
@@ -298,34 +339,59 @@ public class FronteiraManterEditoras extends JPanel implements IFronteira
 	{
 		return "Manter Editoras";
 	}
-	
+
 	private Editora criarEditora() throws FronteiraException
 	{
+		if (tfNome.getText().length() == 0)
+			throw new FronteiraException("Nome: em branco.");
+
 		if (tfNome.getText().length() < 3)
-			throw new FronteiraException("Nome: nome muito curto");
+			throw new FronteiraException("Nome: mínimo de 3 caracteres.");
+
+		if (tfNome.getText().length() > 32)
+			throw new FronteiraException("Nome: limite de 32 caracteres.");
+
+		// TODO VALIDAR CNPJ
+		// TODO VALIDAR TELEFONE
 
 		Date contratoInicio, contratoFim;
 
-		if (tfContratoInicio.getText().equals("__/__/____"))
+		if (tfContratoInicio.getText().equals("  /  /    ") || tfContratoInicio.getText().equals("00/00/0000"))
 			contratoInicio = null;
 		else
 			try {
 				contratoInicio = DateUtil.toDate(tfContratoInicio.getText());
 			} catch (ParseException e) {
-				throw new FronteiraException("Data de Inicio do Contrato: invï¿½lida");
+				throw new FronteiraException("Contrato (Inicio): inválida.");
 			}
 
-		if (tfContratoFim.getText().equals("__/__/____"))
+		if (tfContratoFim.getText().equals("  /  /    ") || tfContratoFim.getText().equals("00/00/0000"))
 			contratoFim = null;
 		else
 			try {
 				contratoFim = DateUtil.toDate(tfContratoFim.getText());
 			} catch (ParseException e) {
-				throw new FronteiraException("Data de Fim de Contrato: invï¿½lida");
+				throw new FronteiraException("Contrato (Fim): inválida.");
 			}
-		
-		String cnpj = tfCnpj.getText().length() == 0 ? null : tfCnpj.getText();
-		String telefone = tfTelefone.getText().length() == 0 ? null : tfTelefone.getText();
+
+		if (contratoInicio == null && contratoFim != null)
+			throw new FronteiraException("Contrato (Inicio): não definido.");
+
+		if (contratoInicio != null && contratoFim == null)
+			throw new FronteiraException("Contrato (Fim): não definido.");
+
+		if (contratoInicio != null && contratoFim != null)
+			if (contratoInicio.getTime() >= contratoFim.getTime())
+				throw new FronteiraException("Contrato: a data de fim deve após o inicio.");
+
+		String cnpj = tfCnpj.getText();
+		String telefone = tfTelefone.getText();
+
+		if (cnpj.equals("  .   .   /    -  ") || cnpj.equals("00.000.000/0000-00"))
+			cnpj = null;
+
+		if (telefone.equals("(  )     -    ") || telefone.equals("(00) 0000-0000"))
+			telefone = null;
 
 		Editora editora = new Editora();
 		editora.setNome(tfNome.getText());
@@ -337,102 +403,108 @@ public class FronteiraManterEditoras extends JPanel implements IFronteira
 		return editora;
 	}
 
+	private void callLimparCampos()
+	{
+		tfNome.setText("");
+		tfCnpj.setText("");
+		tfEndereco.setText("");
+		tfTelefone.setText("");
+		tfContratoInicio.setText("");
+		tfContratoFim.setText("");
+
+		editora = null;
+
+		btnAdicionar.setEnabled(true);
+		btnAtualizar.setEnabled(false);
+		btnExcluir.setEnabled(false);
+	}
+
 	public void callAdicionarEditora()
 	{
 		try {
+
 			editora = criarEditora();
+
+			if (controleEditora.existe(editora.getNome()))
+				if (!MessageUtil.showYesNo("Adicionar Editora", "Editora '%s' já existe, adicionar mesmo assim?", editora.getNome()))
+					return;
 
 			if (controleEditora.adicionar(editora))
 			{
-				MessageUtil.showInfo("Adicionar Editora", "Editora '%s' adicionada com ï¿½xtio!", editora.getNome());
+				MessageUtil.showInfo("Adicionar Editora", "Editora '%s' adicionada com êxtio!", editora.getNome());
 				callLimparCampos();
 			}
 
 			else
-				MessageUtil.showWarning("Adicionar Editora", "NÃ£o foi possÃ­vel adicionar a editora '%s'.", editora.getNome());
+				MessageUtil.showWarning("Adicionar Editora", "Não foi possível adicionar a editora '%s'.", editora.getNome());
 
 		} catch (SQLException e) {
 			MessageUtil.showError("Adicionar Editora", "Falha ao adicionar a editora '%s'.\n- %s", editora.getNome(), e.getMessage());
 		} catch (FronteiraException e) {
-			MessageUtil.showError("Adicionar Editora", "Verifique o campo abaixo:\n- %s", editora.getNome(), e.getMessage());
+			MessageUtil.showError("Adicionar Editora", "Verifique o campo abaixo:\n- %s", e.getMessage());
 		}
 	}
 	
 	public void callAtualizarEditora()
 	{
+		if (editora == null)
+		{
+			MessageUtil.showInfo("Atualizar Editora", "Selecione uma editora na consulta antes.");
+			return;
+		}
+
 		try {
 
+			Editora editoraConsultado = editora;
+
 			editora = criarEditora();
+			editora.setID(editoraConsultado.getID());
 
 			if (controleEditora.atualizar(editora))
 			{
-				MessageUtil.showInfo("Atualizar Editora", "Editora '%s' atualizada com ï¿½xtio!", editora.getNome());
+				editoraConsultado.copiar(editora);
+
+				MessageUtil.showInfo("Atualizar Editora", "Editora '%s' atualizada com êxtio!", editora.getNome());
 				callLimparCampos();
 			}
 
 			else
-				MessageUtil.showWarning("Atualizar Editora", "NÃ£o foi possÃ­vel atualizar a editora '%s'.", editora.getNome());
+				MessageUtil.showWarning("Atualizar Editora", "Não foi possível atualizar a editora '%s'.", editora.getNome());
 
 		} catch (SQLException e) {
 			MessageUtil.showError("Atualizar Editora", "Falha ao atualizar a editora '%s'.\n- %s", editora.getNome(), e.getMessage());
 		} catch (FronteiraException e) {
-			e.printStackTrace();
+			MessageUtil.showError("Atualizar Editora", "Falha ao atualizar o editora '%s'.\n- %s", editora.getNome(), e.getMessage());
 		}
 	}
-	
+
 	private void callExcluirEditora()
 	{
+		if (editora == null)
+		{
+			MessageUtil.showInfo("Excluir Editora", "Selecione uma editora na consulta antes.");
+			return;
+		}
+
 		try {
 
 			if (controleEditora.excluir(editora.getID()))
 			{
-				MessageUtil.showInfo("Excluir Editora", "Editora '%s' excluï¿½da com ï¿½xtio!", editora.getNome());
+				model.remover(editora);
+
+				MessageUtil.showInfo("Excluir Editora", "Editora '%s' excluída com êxtio!", editora.getNome());
 				callLimparCampos();
 			}
 
 			else
-				MessageUtil.showWarning("Excluir Editora", "NÃ£o foi possÃ­vel excluir a editora '%s'.", editora.getNome());
+				MessageUtil.showWarning("Excluir Editora", "NÃ£o foi possível excluir a editora '%s'.", editora.getNome());
 
 		} catch (SQLException e) {
 			MessageUtil.showError("Excluir Editora", "Falha ao excluir a editora '%s'.\n- %s", editora.getNome(), e.getMessage());
 		}
 	}
-	
-	private void callConsultaSelecionar()
-	{
-		editora = model.getLinha(tabelaConsulta.getSelectedRow());
 
-		tfNome.setText(editora.getNome());
-		tfCnpj.setText(editora.getCnpj());
-		tfEndereco.setText(editora.getEndereco());
-		tfTelefone.setText(editora.getTelefone());
-		tfContratoInicio.setText(DateUtil.toString(editora.getContratoInicio()));
-		tfContratoFim.setText(DateUtil.toString(editora.getContratoFim()));
-	}
-	
-	private void callConsultaExcluir()
-	{
-		try {
-
-			Editora editora = model.getLinha(tabelaConsulta.getSelectedRow());
-
-			if (controleEditora.excluir(editora.getID()))
-			{
-				model.removerLinha(tabelaConsulta.getSelectedRow());
-				callLimparCampos();
-
-				MessageUtil.showInfo("Excluir Editora", "Editora '%s' excluï¿½do com ï¿½xito!", editora.getNome());
-			}
-
-			else
-				MessageUtil.showWarning("Excluir Editora", "NÃ£o foi possÃ­vel excluir a editora '%s'.", editora.getNome());
-
-		} catch (SQLException e) {
-			MessageUtil.showError("Excluir Editora", "Falha ao excluir a Editora '%s'.\n- %s", editora.getNome(), e.getMessage());
-		}
-	}
-	
-	private void callFiltro(String filtro, int filtroTipo)
+	private void callFiltrar(String filtro, int filtroTipo)
 	{
 		try {
 
@@ -459,23 +531,70 @@ public class FronteiraManterEditoras extends JPanel implements IFronteira
 			MessageUtil.showError("Filtrar Editoras", "Falha ao filtrar Editoras.\n- %s", e.getMessage());
 		}
 	}
-	
+
+	private void callVerTodos()
+	{
+		try {
+
+			List<Editora> editoras = controleEditora.listar();
+			model.atualizarLista(editoras);
+
+		} catch (SQLException e) {
+			MessageUtil.showError("Ver Todos", "Falha ao listar editoras.\n- %s", e.getMessage());
+		}
+	}
+
+	private void callSelecionarEditora()
+	{
+		editora = model.getLinha(tableConsulta.getSelectedRow());
+
+		tfNome.setText(editora.getNome());
+		tfCnpj.setText(editora.getCnpj());
+		tfEndereco.setText(editora.getEndereco());
+		tfTelefone.setText(editora.getTelefone());
+		tfContratoInicio.setText(DateUtil.toString(editora.getContratoInicio()));
+		tfContratoFim.setText(DateUtil.toString(editora.getContratoFim()));
+
+		btnAdicionar.setEnabled(false);
+		btnAtualizar.setEnabled(true);
+		btnExcluir.setEnabled(true);
+	}
+
+	private void callExcluirEditoraDireto()
+	{
+		try {
+
+			Editora editora = model.getLinha(tableConsulta.getSelectedRow());
+
+			if (controleEditora.excluir(editora.getID()))
+			{
+				model.removerLinha(tableConsulta.getSelectedRow());
+				callLimparCampos();
+
+				MessageUtil.showInfo("Excluir Editora", "Editora '%s' excluído com êxito!", editora.getNome());
+			}
+
+			else
+				MessageUtil.showWarning("Excluir Editora", "NÃ£o foi possível excluir a editora '%s'.", editora.getNome());
+
+		} catch (SQLException e) {
+			MessageUtil.showError("Excluir Editora", "Falha ao excluir a Editora '%s'.\n- %s", editora.getNome(), e.getMessage());
+		}
+	}
+
 	private void callVerLivros()
 	{
-		// TODO Ver Livros
+		Editora editora = model.getLinha(tableConsulta.getSelectedRow());
+
+		if (editora == null)
+		{
+			MessageUtil.showInfo("Ver Livros", "Selecione uma editora na consulta!");
+			return;
+		}
+
+		if (popup == null)
+			popup = new PopUpVerLivros(this);
+
+		popup.carregar(editora);
 	}
-	
-	private void callLimparCampos()
-	{
-		tfNome.setText("");
-		tfCnpj.setText("");
-		tfEndereco.setText("");
-		tfTelefone.setText("");
-		tfContratoInicio.setText("");
-		tfContratoFim.setText("");
-		
-		editora = null;
-	}
-	
-	
 }

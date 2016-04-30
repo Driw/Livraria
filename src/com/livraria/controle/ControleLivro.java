@@ -324,6 +324,18 @@ public class ControleLivro
 		return concluirFiltragem(rs);
 	}
 
+	public List<Livro> filtrarPorEditora(Editora editora) throws SQLException
+	{
+		String sql = "SELECT * FROM livros WHERE editora = ?";
+
+		PreparedStatement ps = connection.prepareStatement(sql);
+		ps.setInt(1, editora.getID());
+
+		ResultSet rs = ps.executeQuery();
+
+		return concluirFiltragem(rs);
+	}
+
 	private List<Livro> concluirFiltragem(ResultSet rs) throws SQLException
 	{
 		List<Livro> livros = new ArrayList<Livro>();

@@ -530,6 +530,12 @@ public class FronteiraManterLivros extends JPanel implements IFronteira
 			MessageUtil.showError("Excluir Livro", "Falha ao excluir o livro '%s'.\n- %s", livro.getTitulo(), e.getMessage());
 		}
 	}
+
+	protected void callConsultaVerAutores()
+	{
+		// TODO Auto-generated method stub
+		
+	}
 	
 	private void callFiltro(String filtro, int filtroTipo)
 	{
@@ -579,5 +585,29 @@ public class FronteiraManterLivros extends JPanel implements IFronteira
 		livro = null;
 		
 		livro = null;
+	}
+
+	protected void callAdicionarResumo()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	protected void callAdicionarSumario()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	protected void callAdicionarAutor()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	protected void callAdicionarCategoria()
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

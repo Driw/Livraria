@@ -98,4 +98,19 @@ public class Editora
 	{
 		return !hasContrato() ? 0 : (int) (contratoFim.getTime() - contratoInicio.getTime() / 86400);
 	}
+
+	public void copiar(Editora editora)
+	{
+		this.id = editora.id;
+		this.cnpj = editora.cnpj;
+		this.nome = editora.nome;
+		this.endereco = editora.endereco;
+		this.telefone = editora.telefone;
+
+		if (editora.contratoInicio != null)
+			this.contratoInicio = new Date(editora.contratoInicio.getTime());
+
+		if (editora.contratoFim != null)
+			this.contratoFim = new Date(editora.contratoFim.getTime());
+	}
 }

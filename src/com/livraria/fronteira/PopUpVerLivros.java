@@ -5,6 +5,7 @@ import javax.swing.JPanel;
 
 import com.livraria.controle.ControleLivro;
 import com.livraria.entidades.Autor;
+import com.livraria.entidades.Editora;
 import com.livraria.entidades.Livro;
 
 import java.sql.SQLException;
@@ -68,6 +69,20 @@ public class PopUpVerLivros extends JFrame
 		try {
 
 			List<Livro> lista = controleLivro.filtrarPorAutor(autor);
+			model.atualizarLista(lista);
+
+		} catch (SQLException e) {
+			MessageUtil.showError("Ver Livros", "Falha durante a consulta:\n- %s", e.getMessage());
+		}
+	}
+
+	public void carregar(Editora editora)
+	{
+		setTitle("Livros do Autor: " +editora.getNome());
+
+		try {
+
+			List<Livro> lista = controleLivro.filtrarPorEditora(editora);
 			model.atualizarLista(lista);
 
 		} catch (SQLException e) {

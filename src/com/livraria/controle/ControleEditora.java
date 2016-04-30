@@ -2,17 +2,18 @@
 package com.livraria.controle;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import org.diverproject.util.sql.MySQL;
 
 import com.livraria.Conexao;
 import com.livraria.entidades.Editora;
+import com.livraria.util.ComponentUtil;
 
 public class ControleEditora
 {
@@ -26,28 +27,51 @@ public class ControleEditora
 	
 	public boolean adicionar(Editora editora) throws SQLException
 	{
-		String sql = "INSERT INTO editoras (cnpj, nome, endereco, telefone) values (?, ?, ?, ?)";
+		Date contratoInicio = null;
+		Date contratoFim = null;
+
+		if (editora.getContratoInicio() != null)
+			contratoInicio = new Date(editora.getContratoInicio().getTime());
+
+		if (editora.getContratoFim() != null)
+			contratoFim = new Date(editora.getContratoFim().getTime());
+
+		String sql = "INSERT INTO editoras (cnpj, nome, endereco, telefone, contrato_inicio, contrato_fim) "
+					+"values (?, ?, ?, ?, ?, ?)";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
-		ps.setString(1, editora.getCnpj());
+		ps.setString(1, ComponentUtil.cnpjClear(editora.getCnpj()));
 		ps.setString(2, editora.getNome());
 		ps.setString(3, editora.getEndereco());
-		ps.setString(4, editora.getTelefone());
+		ps.setString(4, ComponentUtil.telefoneClear(editora.getTelefone()));
+		ps.setDate(5, contratoInicio);
+		ps.setDate(6, contratoFim);
 
-		return ps.execute();
+		return ps.executeUpdate() == Conexao.INSERT_SUCCESSFUL;
 	}
 
 	public boolean atualizar(Editora editora) throws SQLException
 	{
-		String sql = "UPDATE editoras SET cnpj = ?, nome = ?, endereco = ?, "
-					+ "telefone = ? WHERE id = ?";
+		Date contratoInicio = null;
+		Date contratoFim = null;
+
+		if (editora.getContratoInicio() != null)
+			contratoInicio = new Date(editora.getContratoInicio().getTime());
+
+		if (editora.getContratoFim() != null)
+			contratoFim = new Date(editora.getContratoFim().getTime());
+
+		String sql = "UPDATE editoras SET cnpj = ?, nome = ?, endereco = ?, telefone = ?, "
+					+"contrato_inicio = ?, contrato_fim = ? WHERE id = ?";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
-		ps.setString(1, editora.getCnpj());
+		ps.setString(1, ComponentUtil.cnpjClear(editora.getCnpj()));
 		ps.setString(2, editora.getNome());
 		ps.setString(3, editora.getEndereco());
-		ps.setString(4, editora.getTelefone());
-		ps.setInt(5, editora.getID());
+		ps.setString(4, ComponentUtil.telefoneClear(editora.getTelefone()));
+		ps.setDate(5, contratoInicio);
+		ps.setDate(6, contratoFim);
+		ps.setInt(7, editora.getID());
 
 		return ps.executeUpdate() != PreparedStatement.EXECUTE_FAILED;
 	}
@@ -55,6 +79,7 @@ public class ControleEditora
 	public boolean excluir(int id) throws SQLException
 	{
 		String sql = "DELETE FROM editoras WHERE id = ?";
+
 		PreparedStatement ps = connection.prepareStatement(sql);
 		ps.setInt(1, id);
 
@@ -63,45 +88,32 @@ public class ControleEditora
 
 	public Editora selecionar(int id) throws SQLException
 	{
-		Editora editora = new Editora();
-
 		String sql = "SELECT * FROM editoras WHERE id = ?";
+
 		PreparedStatement ps = connection.prepareStatement(sql);
 		ps.setInt(1, id);
-		ResultSet rs = ps.executeQuery();
 
-		editora.setID(id);
-		editora.setCnpj(rs.getString("cnpj"));
-		editora.setNome(rs.getString("nome"));
-		editora.setEndereco(rs.getString("enredeco"));
-		editora.setTelefone(rs.getString("telefone"));
+		ResultSet rs = ps.executeQuery();
+		Editora editora = null;
+
+		if (rs.next())
+			editora = criar(rs);
 
 		return editora;
 	}
 
 	public List<Editora> listar() throws SQLException
 	{
-		List<Editora> editoras = new ArrayList<Editora>();
-
 		String sql = "SELECT * FROM editoras";
 		PreparedStatement ps = connection.prepareStatement(sql);
-		ResultSet rs = ps.executeQuery();
 
-		while (rs.next())
-		{
-			Editora editora = new Editora();
-			editora.setID(rs.getInt("id"));
-			editora.setCnpj(rs.getString("cnpj"));
-			editora.setNome(rs.getString("nome"));
-			editora.setEndereco(rs.getString("enredeco"));
-			editora.setTelefone(rs.getString("telefone"));
-			editoras.add(editora);
-		}
+		ResultSet rs = ps.executeQuery();
+		List<Editora> editoras = concluirFiltragem(rs);
 
 		return editoras;
 	}
 
-	public Vector<Editora> filtrarPorCNPJ(String cnpj) throws SQLException
+	public List<Editora> filtrarPorCNPJ(String cnpj) throws SQLException
 	{
 		String sql = "SELECT * FROM editoras WHERE cnpj LIKE '?%'";
 
@@ -113,7 +125,7 @@ public class ControleEditora
 		return concluirFiltragem(rs);
 	}
 
-	public Vector<Editora> filtrarPorNome(String nome) throws SQLException
+	public List<Editora> filtrarPorNome(String nome) throws SQLException
 	{
 		String sql = "SELECT * FROM editoras WHERE nome = '%?%'";
 
@@ -125,7 +137,7 @@ public class ControleEditora
 		return concluirFiltragem(rs);
 	}
 
-	public Vector<Editora> filtrarPorTelefone(String telefone) throws SQLException
+	public List<Editora> filtrarPorTelefone(String telefone) throws SQLException
 	{
 		String sql = "SELECT * FROM editoras WHERE telefone LIKE '?%'";
 
@@ -137,30 +149,51 @@ public class ControleEditora
 		return concluirFiltragem(rs);
 	}
 
-	public Vector<Editora> concluirFiltragem(ResultSet rs) throws SQLException
+	public List<Editora> concluirFiltragem(ResultSet rs) throws SQLException
 	{
-		Vector<Editora> editoras = new Vector<Editora>();
+		List<Editora> editoras = new ArrayList<Editora>();
 
 		while (rs.next())
 		{
-			Editora editora = new Editora();
-			editora.setID(rs.getInt("id"));
-			editora.setCnpj(rs.getString("cnpj"));
-			editora.setNome(rs.getString("nome"));
-			editora.setEndereco(rs.getString("enredeco"));
-			editora.setTelefone(rs.getString("telefone"));
+			Editora editora = criar(rs);
 			editoras.add(editora);
 		}
 
 		return editoras;
 	}
-	
-	public int getId(String nome) throws SQLException {
-		PreparedStatement ps = connection.prepareStatement("SELECT id FROM editoras WHERE nome LIKE '%?%'");
-		ps.setString(1, nome);
-		ResultSet rs = ps.executeQuery();
-		return rs.getInt("id");
+
+	private Editora criar(ResultSet rs) throws SQLException
+	{
+		java.util.Date contratoInicio = null;
+		java.util.Date contratoFim = null;
+
+		if (rs.getDate("contrato_inicio") != null)
+			contratoInicio = new java.util.Date(rs.getDate("contrato_inicio").getTime());
+
+		if (rs.getDate("contrato_fim") != null)
+			contratoFim = new java.util.Date(rs.getDate("contrato_fim").getTime());
+
+		Editora editora = new Editora();
+		editora.setID(rs.getInt("id"));
+		editora.setCnpj(rs.getString("cnpj"));
+		editora.setNome(rs.getString("nome"));
+		editora.setEndereco(rs.getString("endereco"));
+		editora.setTelefone(rs.getString("telefone"));
+		editora.setContrato(contratoInicio, contratoFim);
+
+		return editora;
 	}
-	
-	
+
+	public boolean existe(String nome) throws SQLException
+	{
+		String sql = "SELECT COUNT(*) as count FROM editoras WHERE nome = ?";
+
+		PreparedStatement ps = connection.prepareStatement(sql);
+		ps.setString(1, nome);
+
+		ResultSet rs = ps.executeQuery();
+		rs.next();
+
+		return rs.getInt("count") != 0;
+	}
 }

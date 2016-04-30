@@ -94,9 +94,13 @@ public class Autor
 	{
 		this.id = autor.id;
 		this.nome = autor.nome;
-		this.nascimento = autor.nascimento == null ? null : new Date(autor.nascimento.getTime());
-		this.falecimento = autor.falecimento == null ? null : new Date(autor.falecimento.getTime());
 		this.localMorte = autor.localMorte;
 		this.biografia = autor.biografia;
+
+		if (autor.nascimento != null)
+			this.nascimento = new Date(autor.nascimento.getTime());
+
+		if (autor.falecimento != null)
+			this.falecimento = new Date(autor.falecimento.getTime());
 	}
 }

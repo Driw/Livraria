@@ -41,18 +41,24 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 	private static final int FILTRO_BIOGRAFIA = 1;
 	private static final int FILTRO_LOCAL_DA_MORTE = 2;
 
+	private ModelManterAutores model;
 	private ControleAutor controleAutor;
+	private Autor autor;
+
 	private JTextField tfNome;
 	private JFormattedTextField tfDataNascimento;
 	private JFormattedTextField tfDataFalecimento;
 	private JTextField tfLocalMorte;
 	private JTextArea tfBiografia;
-	private ModelManterAutores model;
 	private JTable tableConsulta;
 	private JTextField tfFiltro;
 	private JComboBox<String> cbFiltro;
-	private Autor autor;
+
 	private PopUpVerLivros popup;
+
+	private JButton btnAdicionar;
+	private JButton btnAtualizar;
+	private JButton btnExcluir;
 
 	@SuppressWarnings("deprecation")
 	public FronteiraManterAutores()
@@ -139,7 +145,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 		panelDadosAcoes.setToolTipText("As ações abaixos serão aplicas apenas em relação aos dados preenchidos nos campos.");
 		panelDados.add(panelDadosAcoes);
 
-		JButton btnAdicionar = new JButton("Adicionar");
+		btnAdicionar = new JButton("Adicionar");
 		btnAdicionar.setFont(Fronteira.FONT_COMPONENTES);
 		btnAdicionar.addActionListener(new ActionListener()
 		{
@@ -152,7 +158,8 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 		btnAdicionar.setToolTipText("Adicionar irá registrar um novo autor com as informações abaixo.");
 		panelDadosAcoes.add(btnAdicionar);
 
-		JButton btnAtualizar = new JButton("Atualizar");
+		btnAtualizar = new JButton("Atualizar");
+		btnAtualizar.setEnabled(false);
 		btnAtualizar.setFont(Fronteira.FONT_COMPONENTES);
 		btnAtualizar.addActionListener(new ActionListener()
 		{
@@ -162,9 +169,11 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 				callAtualizarAutor();
 			}
 		});
+		btnAtualizar.setToolTipText("Atualizar só irá funcionar se houver um autor selecionado da cosulta.");
 		panelDadosAcoes.add(btnAtualizar);
 
-		JButton btnExcluir = new JButton("Excluir");
+		btnExcluir = new JButton("Excluir");
+		btnExcluir.setEnabled(false);
 		btnExcluir.setFont(Fronteira.FONT_COMPONENTES);
 		btnExcluir.addActionListener(new ActionListener()
 		{
@@ -174,6 +183,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 				callExcluirAutor();
 			}
 		});
+		btnExcluir.setToolTipText("Essa opção de excluir só irá funcionar se houver um autor selecionado da consulta.");
 		panelDadosAcoes.add(btnExcluir);
 
 		JButton btnLimpar = new JButton("Limpar");
@@ -186,6 +196,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 				callLimparCampos();
 			}
 		});
+		btnLimpar.setToolTipText("Limpa todos os campos relacionado aos dados do autor e desseleciona o autor se houver um selecionado.");
 		panelDadosAcoes.add(btnLimpar);
 
 		JSeparator separator = new JSeparator();
@@ -214,12 +225,14 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 				callFiltrar(tfFiltro.getText(), cbFiltro.getSelectedIndex());
 			}
 		});
+		tfFiltro.setToolTipText("Conforme digitado algo irá consultar o banco de dados autores de acordo com o filtro selecionado.");
 		panelConsulta.add(tfFiltro);
 
 		cbFiltro = new JComboBox<String>();
 		cbFiltro.setBounds(504, 22, 145, 25);
 		cbFiltro.addItem("Nome");
 		cbFiltro.addItem("Biografia");
+		cbFiltro.setToolTipText("Filtro irá indicar qual a informação do autor que será escolhida como resultado de busca.");
 		panelConsulta.add(cbFiltro);
 
 		model = new ModelManterAutores();
@@ -238,11 +251,12 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 		tableConsulta.getColumnModel().getColumn(3).setResizable(false);
 		tableConsulta.getColumnModel().getColumn(3).setMinWidth(100);
 		tableConsulta.getColumnModel().getColumn(3).setMaxWidth(100);
-		tableConsulta.getColumnModel().getColumn(3).setResizable(false);
-		tableConsulta.getColumnModel().getColumn(3).setMinWidth(139);
-		tableConsulta.getColumnModel().getColumn(3).setMaxWidth(139);
+		tableConsulta.getColumnModel().getColumn(4).setResizable(false);
+		tableConsulta.getColumnModel().getColumn(4).setMinWidth(139);
+		tableConsulta.getColumnModel().getColumn(4).setMaxWidth(139);
 		tableConsulta.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tableConsulta.setRowSelectionAllowed(true);
+		tableConsulta.setToolTipText("Tabela contendo todos os autores encontrados de acordo com a filtragem escolhida.");
 
 		JScrollPane scrollPaneConsulta = new JScrollPane(tableConsulta);
 		scrollPaneConsulta.setBounds(10, 57, 639, 118);
@@ -253,7 +267,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 		panelConsultaAcoes.setBounds(660, 11, 150, 167);
 		panelConsulta.add(panelConsultaAcoes);
 		panelConsultaAcoes.setLayout(new GridLayout(4, 1, 0, 5));
-		
+
 		JButton btnVerTodos = new JButton("Ver Todos");
 		btnVerTodos.setFont(Fronteira.FONT_COMPONENTES);
 		btnVerTodos.addActionListener(new ActionListener()
@@ -264,6 +278,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 				callVerTodos();
 			}
 		});
+		btnVerTodos.setToolTipText("Essa opção irá buscar todos os autores existentes no banco dedados.");
 		panelConsultaAcoes.add(btnVerTodos);
 
 		JButton btnConsultaSelecionar = new JButton("Selecionar");
@@ -276,6 +291,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 				callSelecionarAutor();
 			}
 		});
+		btnConsultaSelecionar.setToolTipText("Puxa os dados do autor selecionado na consulta para os campos, permitindo atualizar ou excluir.");
 		panelConsultaAcoes.add(btnConsultaSelecionar);
 
 		JButton btnConsultaExcluir = new JButton("Excluir");
@@ -288,6 +304,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 				callExcluirAutorDireto();
 			}
 		});
+		btnConsultaExcluir.setToolTipText("Permite excluir um autor que esteja selecionado na tabela de consulta.");
 		panelConsultaAcoes.add(btnConsultaExcluir);
 
 		JButton btnConsultaVerLivros = new JButton("Ver Livros");
@@ -300,6 +317,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 				callVerLivros();
 			}
 		});
+		btnConsultaVerLivros.setToolTipText("Ao clicar uma nova tela irá abrir listando todos os livros do autor selecionado na consulta.");
 		panelConsultaAcoes.add(btnConsultaVerLivros);
 
 		tfNome.setNextFocusableComponent(tfDataNascimento);
@@ -337,7 +355,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 			try {
 				nascimento = DateUtil.toDate(tfDataNascimento.getText());
 			} catch (ParseException e) {
-				throw new FronteiraException("Data de Nascimento: inválida");
+				throw new FronteiraException("Data de Nascimento: inválida.");
 			}
 
 		if (tfDataFalecimento.getText().equals("  /  /    ") || tfDataFalecimento.getText().equals("00/00/0000"))
@@ -346,8 +364,12 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 			try {
 				falecimento = DateUtil.toDate(tfDataFalecimento.getText());
 			} catch (ParseException e) {
-				throw new FronteiraException("Data de Falecimento: inválida");
+				throw new FronteiraException("Data de Falecimento: inválida.");
 			}
+
+		if (nascimento != null && falecimento != null)
+			if (nascimento.getTime() >= falecimento.getTime())
+				throw new FronteiraException("Data: nascimento deve vir antes do falescimento.");
 
 		if (tfLocalMorte.getText().length() > 32)
 			throw new FronteiraException("Possível Morte: limite de 32 caracteres.");
@@ -377,6 +399,10 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 		tfBiografia.setText("");
 
 		autor = null;
+
+		btnAdicionar.setEnabled(true);
+		btnAtualizar.setEnabled(false);
+		btnExcluir.setEnabled(false);
 	}
 
 	private void callAdicionarAutor()
@@ -386,7 +412,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 			autor = criarAutor();
 
 			if (controleAutor.existe(autor.getNome()))
-				if (!MessageUtil.showYesNo("Adicionar Autor", "Aturo '%s' já existente, adicionar mesmo assim?", autor.getNome()))
+				if (!MessageUtil.showYesNo("Adicionar Autor", "Autor '%s' já existente, adicionar mesmo assim?", autor.getNome()))
 					return;
 
 			if (controleAutor.adicionar(autor))
@@ -407,6 +433,12 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 
 	private void callAtualizarAutor()
 	{
+		if (autor == null)
+		{
+			MessageUtil.showInfo("Atualizar Autor", "Selecione um autor na consulta antes.");
+			return;
+		}
+
 		try {
 
 			Autor autorConsultado = autor;
@@ -434,6 +466,12 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 
 	private void callExcluirAutor()
 	{
+		if (autor == null)
+		{
+			MessageUtil.showInfo("Excluir Autor", "Selecione um autor na consulta antes.");
+			return;
+		}
+
 		try {
 
 			if (controleAutor.excluir(autor.getID()))
@@ -488,7 +526,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 			model.atualizarLista(autores);
 
 		} catch (SQLException e) {
-			MessageUtil.showError("Ver Todos", "Falha ao filtrar autores.\n- %s", e.getMessage());
+			MessageUtil.showError("Ver Todos", "Falha ao listar autores.\n- %s", e.getMessage());
 		}
 	}
 
@@ -501,6 +539,10 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 		tfDataFalecimento.setText(DateUtil.toString(autor.getFalecimento()));
 		tfLocalMorte.setText(autor.getLocalMorte());
 		tfBiografia.setText(autor.getBiografia());
+
+		btnAdicionar.setEnabled(false);
+		btnAtualizar.setEnabled(true);
+		btnExcluir.setEnabled(true);
 	}
 
 	private void callExcluirAutorDireto()

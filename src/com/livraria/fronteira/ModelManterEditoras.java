@@ -8,14 +8,15 @@ import javax.swing.table.DefaultTableModel;
 import org.diverproject.util.DateUtil;
 
 import com.livraria.entidades.Editora;
+import com.livraria.util.ComponentUtil;
 
 @SuppressWarnings("serial")
 public class ModelManterEditoras extends DefaultTableModel
 {
-	private static final int COLUNA_NOME = 1;
-	private static final int COLUNA_CNPJ = 2;
-	private static final int COLUNA_TELEFONE = 3;
-	private static final int COLUNA_CONTRATO = 4;
+	private static final int COLUNA_NOME = 0;
+	private static final int COLUNA_CNPJ = 1;
+	private static final int COLUNA_TELEFONE = 2;
+	private static final int COLUNA_CONTRATO = 3;
 
 	private static final String COLUNS[] = new String[]
 	{
@@ -62,8 +63,14 @@ public class ModelManterEditoras extends DefaultTableModel
 			switch (column)
 			{
 				case COLUNA_NOME: return editora.getNome();
-				case COLUNA_CNPJ: return editora.getCnpj();
-				case COLUNA_TELEFONE: return editora.getTelefone();
+				case COLUNA_CNPJ:
+					String cnpj = ComponentUtil.cnpjFormmat(editora.getCnpj());
+					return cnpj == null ? "-" : cnpj;
+
+				case COLUNA_TELEFONE:
+					String telefone = ComponentUtil.telefoneFormmat(editora.getTelefone());
+					return telefone == null ? "-" : telefone;
+
 				case COLUNA_CONTRATO:
 					String inicio = DateUtil.toString(editora.getContratoInicio());
 					String fim = DateUtil.toString(editora.getContratoFim());
@@ -81,7 +88,10 @@ public class ModelManterEditoras extends DefaultTableModel
 
 	public Editora getLinha(int linha)
 	{
-		return editoras.get(linha);
+		if (linha >= 0 && linha < editoras.size())
+			return editoras.get(linha);
+
+		return null;
 	}
 	
 	public void removerLinha(int linha)
@@ -96,5 +106,17 @@ public class ModelManterEditoras extends DefaultTableModel
 		editoras = lista;
 
 		fireTableDataChanged();
+	}
+
+	public void remover(Editora editora)
+	{
+		for (int i = 0; i < editoras.size(); i++)
+			if (editoras.get(i).equals(editora))
+			{
+				editoras.remove(i);
+				fireTableDataChanged();
+
+				return;
+			}
 	}
 }

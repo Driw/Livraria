@@ -13,7 +13,7 @@ CREATE TABLE livros
 (
 	id INT AUTO_INCREMENT,
 	isbn CHAR(13),
-	titulo VARCHAR(48),
+	titulo VARCHAR(48) NOT NULL,
 	editora INT,
 	preco FLOAT,
 	publicacao DATE,
@@ -41,9 +41,11 @@ CREATE TABLE editoras
 (
 	id INT AUTO_INCREMENT,
 	cnpj CHAR(14),
-	nome VARCHAR(32),
+	nome VARCHAR(32) NOT NULL,
 	endereco VARCHAR(48),
 	telefone VARCHAR(11),
+	contrato_inicio DATE,
+	contrato_fim DATE,
 
 	PRIMARY KEY (id),
 	UNIQUE (cnpj)
@@ -52,7 +54,7 @@ CREATE TABLE editoras
 CREATE TABLE autores
 (
 	id INT AUTO_INCREMENT,
-	nome VARCHAR(48),
+	nome VARCHAR(48) NOT NULL,
 	nascimento DATE,
 	falecimento DATE,
 	local_morte VARCHAR(32),
@@ -63,8 +65,8 @@ CREATE TABLE autores
 
 CREATE TABLE livros_autores
 (
-	livro INT,
-	autor INT,
+	livro INT NOT NULL,
+	autor INT NOT NULL,
 
 	PRIMARY KEY (livro, autor),
 	FOREIGN KEY (livro) REFERENCES livros (id),
@@ -74,18 +76,18 @@ CREATE TABLE livros_autores
 CREATE TABLE carrinhos
 (
 	id INT AUTO_INCREMENT,
-	criado DATE,
-	concluido DATE,
-	estado INT,
+	criado DATE NOT NULL,
+	concluido DATE NOT NULL,
+	estado INT NOT NULL,
 
 	PRIMARY KEY (id)
 );
 
 CREATE TABLE carrinhos_itens
 (
-	carrinho INT,
-	livro INT,
-	quantidade INT,
+	carrinho INT NOT NULL,
+	livro INT NOT NULL,
+	quantidade INT NOT NULL,
 
 	PRIMARY KEY (carrinho, livro),
 	FOREIGN KEY (carrinho) REFERENCES carrinhos(id),

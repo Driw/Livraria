@@ -115,7 +115,7 @@ public class ControleEditora
 
 	public List<Editora> filtrarPorCNPJ(String cnpj) throws SQLException
 	{
-		String sql = "SELECT * FROM editoras WHERE cnpj LIKE '%"+cnpj+"%'";
+		String sql = "SELECT * FROM editoras WHERE cnpj LIKE '%" +cnpj+ "%'";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
 		ps.setString(1, cnpj);
@@ -127,7 +127,7 @@ public class ControleEditora
 
 	public List<Editora> filtrarPorNome(String nome) throws SQLException
 	{
-		String sql = "SELECT * FROM editoras WHERE nome = '%"+nome+"%'";
+		String sql = "SELECT * FROM editoras WHERE nome = '%" +nome+ "%'";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
 		ps.setString(1, nome);
@@ -139,7 +139,7 @@ public class ControleEditora
 
 	public List<Editora> filtrarPorTelefone(String telefone) throws SQLException
 	{
-		String sql = "SELECT * FROM editoras WHERE telefone LIKE '%"+telefone+"%'";
+		String sql = "SELECT * FROM editoras WHERE telefone LIKE '%" +telefone+ "%'";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
 		ps.setString(1, telefone);
@@ -195,5 +195,11 @@ public class ControleEditora
 		rs.next();
 
 		return rs.getInt("count") != 0;
+	}
+
+	public void truncate() throws SQLException
+	{
+		PreparedStatement ps = connection.prepareStatement("TRUNCATE editoras");
+		ps.executeUpdate();
 	}
 }

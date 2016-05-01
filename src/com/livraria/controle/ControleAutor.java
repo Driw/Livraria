@@ -85,21 +85,14 @@ public class ControleAutor
 
 	public Autor selecionar(int id) throws SQLException
 	{
-		Autor autor = new Autor();
-
 		String sql = "SELECT * FROM autores WHERE id = ?";
 		PreparedStatement ps = connection.prepareStatement(sql);
 		ps.setInt(1, id);
-		ResultSet rs = ps.executeQuery();
-			
-		autor.setID(id);
-		autor.setNome(rs.getString("nome"));
-		autor.setNascimento(rs.getDate("nascimento"));
-		autor.setFalecimento(rs.getDate("falecimento"));
-		autor.setLocalMorte(rs.getString("local_morte"));
-		autor.setBiografia(rs.getString("biografia"));
 
-		return autor;
+		ResultSet rs = ps.executeQuery();
+		rs.next();
+
+		return criar(rs);
 	}
 
 	public List<Autor> listar() throws SQLException
@@ -148,17 +141,24 @@ public class ControleAutor
 
 		while (rs.next())
 		{
-			Autor autor = new Autor();
-			autor.setID(rs.getInt("id"));
-			autor.setNome(rs.getString("nome"));
-			autor.setNascimento(rs.getDate("nascimento"));
-			autor.setFalecimento(rs.getDate("falecimento"));
-			autor.setLocalMorte(rs.getString("local_morte"));
-			autor.setBiografia(rs.getString("biografia"));
+			Autor autor = criar(rs);
 			autores.add(autor);
 		}
 
 		return autores;
+	}
+
+	private Autor criar(ResultSet rs) throws SQLException
+	{
+		Autor autor = new Autor();
+		autor.setID(rs.getInt("id"));
+		autor.setNome(rs.getString("nome"));
+		autor.setNascimento(rs.getDate("nascimento"));
+		autor.setFalecimento(rs.getDate("falecimento"));
+		autor.setLocalMorte(rs.getString("local_morte"));
+		autor.setBiografia(rs.getString("biografia"));
+
+		return autor;
 	}
 
 	public boolean existe(String nome) throws SQLException
@@ -172,5 +172,11 @@ public class ControleAutor
 		rs.next();
 
 		return rs.getInt("count") != 0;
+	}
+
+	public void truncate() throws SQLException
+	{
+		PreparedStatement ps = connection.prepareStatement("TRUNCATE autores");
+		ps.executeUpdate();
 	}
 }

@@ -18,6 +18,7 @@ import com.livraria.entidades.Editora;
 import com.livraria.entidades.Livro;
 import com.livraria.entidades.LivroAutores;
 import com.livraria.entidades.LivroCategorias;
+import com.livraria.util.ComponentUtil;
 
 public class ControleLivro
 {
@@ -31,14 +32,20 @@ public class ControleLivro
 
 	public boolean adicionar(Livro livro) throws SQLException
 	{
+		if (livro.getPublicacao() == null)
+			throw new SQLException("publicação nula");
+
+		if (livro.getEditora() == null)
+			throw new SQLException("editora nula");
+
 		Date publicacao = new Date(livro.getPublicacao().getTime());
 
-		String sql = "INSERT INTO livros (isbn, titulo, editora, preco, publicacao, pagina, capa,"
-					+" resumo, sumario)"
-					+" values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO livros (isbn, titulo, editora, preco, publicacao, paginas, "
+					+"capa, resumo, sumario)"
+					+" values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
-		ps.setString(1, livro.getIsbn());
+		ps.setString(1, ComponentUtil.isbnClear(livro.getIsbn()));
 		ps.setString(2, livro.getTitulo());
 		ps.setInt(3, livro.getEditora().getID());
 		ps.setFloat(4, livro.getPreco());
@@ -48,8 +55,16 @@ public class ControleLivro
 		ps.setString(8, livro.getResumo());
 		ps.setString(9, livro.getSumario());
 
-		if (!ps.execute())
+		if (ps.executeUpdate() != Conexao.INSERT_SUCCESSFUL)
 			return false;
+
+		sql = "SELECT auto_increment FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'livros'";
+		ps = connection.prepareStatement(sql);
+
+		ResultSet rs = ps.executeQuery();
+		rs.next();
+
+		livro.setID(rs.getInt("auto_increment") - 1);
 
 		for (Categoria categoria : livro.getLivroCategorias().listar())
 			if (!adicionarCategoria(livro, categoria))
@@ -64,8 +79,11 @@ public class ControleLivro
 
 	public boolean atualizar(Livro livro) throws SQLException
 	{
-		for (Autor autor : livro.getLivroAutores().listar())
-			adicionarAutor(livro, autor);
+		if (livro.getPublicacao() == null)
+			throw new SQLException("publicação nula");
+
+		if (livro.getEditora() == null)
+			throw new SQLException("editora nula");
 
 		Date publicacao = new Date(livro.getPublicacao().getTime());
 
@@ -74,7 +92,7 @@ public class ControleLivro
 					+" WHERE id = ?";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
-		ps.setString(1, livro.getIsbn());
+		ps.setString(1, ComponentUtil.isbnClear(livro.getIsbn()));
 		ps.setString(2, livro.getTitulo());
 		ps.setInt(3, livro.getEditora().getID());
 		ps.setFloat(4, livro.getPreco());
@@ -84,6 +102,12 @@ public class ControleLivro
 		ps.setString(8, livro.getResumo());
 		ps.setString(9, livro.getSumario());
 		ps.setInt(10, livro.getID());
+
+		for (Categoria categoria : livro.getLivroCategorias().listar())
+			adicionarCategoria(livro, categoria);
+
+		for (Autor autor : livro.getLivroAutores().listar())
+			adicionarAutor(livro, autor);
 
 		return ps.executeUpdate() != PreparedStatement.EXECUTE_FAILED;
 	}
@@ -106,8 +130,6 @@ public class ControleLivro
 
 	public Livro selecionar(int id) throws SQLException
 	{
-		Livro livro = new Livro();
-
 		String sql = "SELECT * FROM livros WHERE id = ?";
 		PreparedStatement ps = connection.prepareStatement(sql);
 		ps.setInt(1, id);
@@ -117,20 +139,7 @@ public class ControleLivro
 		if (!rs.next())
 			return null;
 
-		ControleEditora controleEditora = new ControleEditora();
-		Editora editora = controleEditora.selecionar(rs.getInt("editora"));
-
-		livro.setID(id);
-		livro.setIsbn(rs.getString("isbn"));
-		livro.setTitulo(rs.getString("titulo"));
-		livro.setEditora(editora);
-		livro.setPreco(rs.getFloat("preco"));
-		livro.setPublicacao(rs.getDate("publicacao"));
-		livro.setPaginas(rs.getInt("paginas"));
-		livro.setCapa(rs.getInt("capa"));
-		livro.setResumo(rs.getString("resumo"));
-		livro.setSumario(rs.getString("sumario"));
-
+		Livro livro = criar(rs);
 		carregarCategorias(livro);
 		carregarAutores(livro);
 
@@ -146,7 +155,7 @@ public class ControleLivro
 		ps.setInt(2, categoria.getID());
 
 		if (ps.executeQuery().next())
-			return false;
+			return true;
 
 		sql = "INSERT INTO livros_categorias (livro, categoria) VALUES (?, ?)";
 
@@ -154,7 +163,7 @@ public class ControleLivro
 		ps.setInt(1, livro.getID());
 		ps.setInt(2, categoria.getID());
 
-		return ps.executeUpdate() == PreparedStatement.EXECUTE_FAILED;
+		return ps.executeUpdate() == Conexao.INSERT_SUCCESSFUL;
 	}
 
 	private boolean removerCategoria(Livro livro) throws SQLException
@@ -169,9 +178,9 @@ public class ControleLivro
 
 	public void carregarCategorias(Livro livro) throws SQLException
 	{
-		String sql = "SELECT cdus.id, cdus.nome, cdus.tema"
-					+" INNER JOIN cdus ON cdus.id = livros_categorias.categoria"
-					+" WHERE livros_categorias.livro = ?";
+		String sql = "SELECT categorias.id, categorias.codigo, categorias.tema FROM livros_categorias "
+					+"INNER JOIN categorias ON categorias.id = livros_categorias.categoria "
+					+"WHERE livros_categorias.livro = ?";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
 		ps.setInt(1, livro.getID());
@@ -187,6 +196,7 @@ public class ControleLivro
 			categoria.setID(rs.getInt("id"));
 			categoria.setCodigo(rs.getString("codigo"));
 			categoria.setTema(rs.getString("tema"));
+			categorias.adicionar(categoria);
 		}
 	}
 
@@ -199,7 +209,7 @@ public class ControleLivro
 		ps.setInt(2, autor.getID());
 
 		if (ps.executeQuery().next())
-			return false;
+			return true;
 
 		sql = "INSERT INTO livros_autores (livro, autor) VALUES (?, ?)";
 
@@ -207,7 +217,7 @@ public class ControleLivro
 		ps.setInt(1, livro.getID());
 		ps.setInt(2, autor.getID());
 
-		return ps.executeUpdate() == PreparedStatement.EXECUTE_FAILED;
+		return ps.executeUpdate() == Conexao.INSERT_SUCCESSFUL;
 	}
 
 	private boolean removerAutor(Livro livro) throws SQLException
@@ -222,10 +232,10 @@ public class ControleLivro
 
 	public void carregarAutores(Livro livro) throws SQLException
 	{
-		String sql = "SELECT autores.id, autores.nome, autores.nascimento, autores.falecimento,"
-					+" autores.localMorte, autores.biografia FROM livros_categorias"
-					+" INNER JOIN autores ON autores.id = livros_categorias.livro"
-					+" WHERE livros_categorias.livro = ?";
+		String sql = "SELECT autores.id, autores.nome, autores.nascimento, autores.falecimento, "
+					+"autores.local_morte, autores.biografia FROM livros_autores "
+					+"INNER JOIN autores ON autores.id = livros_autores.autor "
+					+"WHERE livros_autores.livro = ?";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
 		ps.setInt(1, livro.getID());
@@ -242,10 +252,20 @@ public class ControleLivro
 			autor.setNome(rs.getString("nome"));
 			autor.setNascimento(rs.getDate("nascimento"));
 			autor.setFalecimento(rs.getDate("falecimento"));
-			autor.setLocalMorte(rs.getString("localMorte"));
+			autor.setLocalMorte(rs.getString("local_morte"));
 			autor.setBiografia(rs.getString("biografia"));
 			autores.adicionar(autor);
 		}
+	}
+
+	public List<Livro> listar() throws SQLException
+	{
+		String sql = "SELECT * FROM livros";
+
+		PreparedStatement ps = connection.prepareStatement(sql);
+		ResultSet rs = ps.executeQuery();
+
+		return concluirFiltragem(rs);
 	}
 
 	public List<Livro> filtrarPorISBN(String isbn) throws SQLException
@@ -339,26 +359,55 @@ public class ControleLivro
 	private List<Livro> concluirFiltragem(ResultSet rs) throws SQLException
 	{
 		List<Livro> livros = new ArrayList<Livro>();
-		ControleEditora controleEditora = new ControleEditora();
 
 		while (rs.next())
 		{
-			Editora editora = controleEditora.selecionar(rs.getInt("editora"));
-
-			Livro livro = new Livro();
-			livro.setID(rs.getInt("id"));
-			livro.setIsbn(rs.getString("isbn"));
-			livro.setTitulo(rs.getString("titulo"));
-			livro.setEditora(editora);
-			livro.setPreco(rs.getFloat("preco"));
-			livro.setPublicacao(rs.getDate("publicacao"));
-			livro.setPaginas(rs.getInt("paginas"));
-			livro.setCapa(rs.getInt("capa"));
-			livro.setResumo(rs.getString("resumo"));
-			livro.setSumario(rs.getString("sumario"));
+			Livro livro = criar(rs);
 			livros.add(livro);
 		}
 
 		return livros;
+	}
+
+	public Livro criar(ResultSet rs) throws SQLException
+	{
+		ControleEditora controleEditora = new ControleEditora();
+		Editora editora = controleEditora.selecionar(rs.getInt("editora"));
+
+		Livro livro = new Livro();
+		livro.setID(rs.getInt("id"));
+		livro.setIsbn(rs.getString("isbn"));
+		livro.setTitulo(rs.getString("titulo"));
+		livro.setEditora(editora);
+		livro.setPreco(rs.getFloat("preco"));
+		livro.setPublicacao(rs.getDate("publicacao"));
+		livro.setPaginas(rs.getInt("paginas"));
+		livro.setCapa(rs.getInt("capa"));
+		livro.setResumo(rs.getString("resumo"));
+		livro.setSumario(rs.getString("sumario"));
+
+		return livro;
+	}
+
+	public boolean existe(String titulo) throws SQLException
+	{
+		String sql = "SELECT COUNT(*) as count FROM livros WHERE titulo = ?";
+
+		PreparedStatement ps = connection.prepareStatement(sql);
+		ps.setString(1, titulo);
+
+		ResultSet rs = ps.executeQuery();
+		rs.next();
+
+		return rs.getInt("count") != 0;
+	}
+
+	public void trucate() throws SQLException
+	{
+		PreparedStatement ps = null;
+
+		ps = connection.prepareStatement("TRUNCATE livros_categorias");	ps.executeUpdate();
+		ps = connection.prepareStatement("TRUNCATE livros_autores");	ps.executeUpdate();
+		ps = connection.prepareStatement("TRUNCATE livros");			ps.executeUpdate();
 	}
 }

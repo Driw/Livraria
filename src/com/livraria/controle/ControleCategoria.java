@@ -12,90 +12,91 @@ import org.diverproject.util.sql.MySQL;
 import com.livraria.Conexao;
 import com.livraria.entidades.Categoria;
 
-public class ControleCategoria {
-	
+public class ControleCategoria
+{
 	private static final Connection connection;
-	
+
 	static
 	{
 		MySQL mysql = Conexao.getMySQL();
 		connection = mysql.getConnection();
 	}
-	
+
 	public boolean adicionar(Categoria categoria) throws SQLException
 	{
-		String sql = "INSERT INTO cdus (codigo, tema) values (?, ?)";
-		
+		String sql = "INSERT INTO categorias (codigo, tema) VALUES (?, ?)";
+
 		PreparedStatement ps = connection.prepareStatement(sql);
 		ps.setString(1, categoria.getCodigo());
 		ps.setString(2, categoria.getTema());
-		
+
 		return ps.executeUpdate() == Conexao.INSERT_SUCCESSFUL;
 	}
-	
+
 	public boolean atualizar(Categoria categoria) throws SQLException
 	{
-		
-		String sql = "UPDATE cdus SET codigo = ?, tema = ? WHERE id = ?";
+		String sql = "UPDATE categorias SET codigo = ?, tema = ? WHERE id = ?";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
 		ps.setString(1, categoria.getCodigo());
 		ps.setString(2, categoria.getTema());
 		ps.setInt(3, categoria.getID());
 
-		return ps.executeUpdate() != PreparedStatement.EXECUTE_FAILED;
+		return ps.executeUpdate() == Conexao.UPDATE_SUCCESSFUL;
 	}
-	
-	public boolean excluir(int id) throws SQLException
+
+	public boolean excluir(Categoria categoria) throws SQLException
 	{
-		String sql = "DELETE FROM cdus WHERE id = ?";
+		String sql = "DROP * FROM livros_categorias WHERE cdu = ?";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
-		ps.setInt(1, id);
+		ps.setInt(1, categoria.getID());
+		ps.executeUpdate();
 
-		return ps.executeUpdate() != PreparedStatement.EXECUTE_FAILED;
+		sql = "DROP * FROM categorias WHERE id = ?";
+
+		ps = connection.prepareStatement(sql);
+		ps.setInt(1, categoria.getID());
+
+		return ps.executeUpdate() == Conexao.DELETE_SUCCESSFUL;
 	}
 
 	public Categoria selecionar(int id) throws SQLException
 	{
-		String sql = "SELECT * FROM cdus WHERE id = ?";
+		String sql = "SELECT * FROM categorias WHERE id = ?";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
 		ps.setInt(1, id);
 
 		ResultSet rs = ps.executeQuery();
-		Categoria categoria = null;
+		rs.next();
 
-		if (rs.next())
-			categoria = criar(rs);
-
-		return categoria;
+		return criar(rs);
 	}
-	
+
 	public List<Categoria> listar() throws SQLException
 	{
-		String sql = "SELECT * FROM cdus";
+		String sql = "SELECT * FROM categorias";
+
 		PreparedStatement ps = connection.prepareStatement(sql);
-
 		ResultSet rs = ps.executeQuery();
-		List<Categoria> categorias = concluirFiltragem(rs);
 
-		return categorias;
+		return concluirFiltragem(rs);
 	}
 
 	public List<Categoria> filtrarPorCodigo(String codigo) throws SQLException
 	{
-		String sql = "SELECT * FROM cdus WHERE codigo LIKE '%"+codigo+"%'";
+		String sql = "SELECT * FROM categorias WHERE codigo LIKE '%" +codigo+ "%'";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
 		ResultSet rs = ps.executeQuery();
 
 		return concluirFiltragem(rs);
 	}
-	
+
 	public List<Categoria> filtrarPorTema(String tema) throws SQLException
 	{
-		String sql = "SELECT * FROM cdus WHERE tema LIKE '%"+tema+"%'";
+		String sql = "SELECT * FROM categorias WHERE tema LIKE '%" +tema+ "%'";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
 		ResultSet rs = ps.executeQuery();
@@ -103,9 +104,9 @@ public class ControleCategoria {
 		return concluirFiltragem(rs);
 	}
 
-	public List<Categoria> concluirFiltragem(ResultSet rs) throws SQLException
+	private List<Categoria> concluirFiltragem(ResultSet rs) throws SQLException
 	{
-		List<Categoria> categorias = new ArrayList<Categoria>();
+		List<Categoria> categorias = new ArrayList<>();
 
 		while (rs.next())
 		{
@@ -128,7 +129,7 @@ public class ControleCategoria {
 
 	public boolean existe(String tema) throws SQLException
 	{
-		String sql = "SELECT COUNT(*) as count FROM cdus WHERE tema = ?";
+		String sql = "SELECT COUNT(*) as count FROM categorias WHERE tema = ?";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
 		ps.setString(1, tema);

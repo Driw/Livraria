@@ -11,11 +11,14 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
 
+import com.livraria.GerarMassaDeDados;
 import com.livraria.JanelaListener;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+
+import org.diverproject.util.MessageUtil;
 
 public class Fronteira
 {
@@ -55,6 +58,17 @@ public class Fronteira
 
 		JMenu mnMenuPrincipal = new JMenu("Menu Principal");
 		menuBar.add(mnMenuPrincipal);
+
+		JMenuItem miGerarMassaDeDados = new JMenuItem("Gerar Massa de Dados");
+		miGerarMassaDeDados.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				callGerarMassaDeDados();
+			}
+		});
+		mnMenuPrincipal.add(miGerarMassaDeDados);
 
 		JMenuItem miPaginaInicial = new JMenuItem("Página Inicial");
 		miPaginaInicial.addActionListener(new ActionListener()
@@ -142,6 +156,20 @@ public class Fronteira
 		JMenu mnRelatorios = new JMenu("Relatórios");
 		menuBar.add(mnRelatorios);
 		frame.addWindowListener(JanelaListener.getInstancia());
+	}
+
+	private void callGerarMassaDeDados()
+	{
+		GerarMassaDeDados gmd = new GerarMassaDeDados();
+		gmd.truncate();
+
+		MessageUtil.showInfo("Gerar Massa De Dados", "Todos os livros, editoras e autores antigos foram removidos.");
+
+		gmd.gerarEditoras(30);
+		gmd.gerarAutores(150);
+		gmd.gerarLivros(200);
+
+		MessageUtil.showInfo("Gerar Massa De Dados", "Massa de Dados pora teste concluído.");
 	}
 
 	private void callPaginaInicial()

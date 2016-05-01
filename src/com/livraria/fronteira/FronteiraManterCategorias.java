@@ -33,35 +33,35 @@ public class FronteiraManterCategorias extends JPanel implements IFronteira
 {
 	private static final int FILTRO_CODIGO = 0;
 	private static final int FILTRO_TEMA = 1;
-	
+
 	private ModelManterCategorias model;
 	private ControleCategoria controleCategoria;
 	private Categoria categoria;
-	
+
 	private JTextField tfCodigo;
 	private JTextField tfTema;
-	
+
 	private JButton btnAdicionar;
 	private JButton btnAtualizar;
 	private JButton btnExcluir;
-	
+
 	private JTextField tfFiltro;
 	private JComboBox<String> cbFiltro;
 	private JTable tableConsulta;
-	
+
 	public FronteiraManterCategorias()
 	{
 		controleCategoria = new ControleCategoria();
-		
+
 		setSize(820, 460);
 		setLayout(null);
-		
+
 		JPanel panelDados = new JPanel();
 		panelDados.setBorder(new TitledBorder(null, "Dados", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panelDados.setBounds(0, 0, 820, 200);
 		panelDados.setLayout(null);
 		add(panelDados);
-		
+
 		JLabel lblCodigo = new JLabel("Codigo :");
 		lblCodigo.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblCodigo.setFont(Fronteira.FONT_COMPONENTES);
@@ -81,7 +81,7 @@ public class FronteiraManterCategorias extends JPanel implements IFronteira
 		tfTema = new JTextField();
 		tfTema.setBounds(170, 84, 480, 25);
 		panelDados.add(tfTema);
-		
+
 		JPanel panelDadosAcoes = new JPanel();
 		panelDadosAcoes.setBorder(new TitledBorder(null, "Ações", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panelDadosAcoes.setBounds(660, 11, 150, 229);
@@ -140,7 +140,7 @@ public class FronteiraManterCategorias extends JPanel implements IFronteira
 			}
 		});
 		panelDadosAcoes.add(btnLimpar);
-		
+
 		JSeparator separator = new JSeparator();
 		separator.setBounds(0, 212, getWidth(), 12);
 		add(separator);
@@ -150,7 +150,7 @@ public class FronteiraManterCategorias extends JPanel implements IFronteira
 		panelConsulta.setBounds(0, 225, 820, 230);
 		panelConsulta.setLayout(null);
 		add(panelConsulta);
-		
+
 		JLabel lblFiltro = new JLabel("Filtro :");
 		lblFiltro.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblFiltro.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -174,20 +174,20 @@ public class FronteiraManterCategorias extends JPanel implements IFronteira
 		cbFiltro.addItem("Codigo");
 		cbFiltro.addItem("Tema");
 		panelConsulta.add(cbFiltro);
-		
+
 		model = new ModelManterCategorias();
-		
+
 		tableConsulta = new JTable();
 		tableConsulta.setModel(model);
 		tableConsulta.getColumnModel().getColumn(0).setResizable(false);
 		tableConsulta.getColumnModel().getColumn(0).setMinWidth(150);
 		tableConsulta.getColumnModel().getColumn(0).setMaxWidth(150);
 		tableConsulta.getColumnModel().getColumn(1).setResizable(false);
-		tableConsulta.getColumnModel().getColumn(1).setMinWidth(450);
-		tableConsulta.getColumnModel().getColumn(1).setMaxWidth(450);
+		tableConsulta.getColumnModel().getColumn(1).setMinWidth(490);
+		tableConsulta.getColumnModel().getColumn(1).setMaxWidth(490);
 		tableConsulta.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tableConsulta.setRowSelectionAllowed(true);
-		
+
 		JScrollPane scrollPaneConsulta = new JScrollPane(tableConsulta);
 		scrollPaneConsulta.setBounds(10, 57, 640, 160);
 		panelConsulta.add(scrollPaneConsulta);
@@ -197,7 +197,7 @@ public class FronteiraManterCategorias extends JPanel implements IFronteira
 		panelConsultaAcoes.setBounds(660, 11, 150, 187);
 		panelConsulta.add(panelConsultaAcoes);
 		panelConsultaAcoes.setLayout(new GridLayout(4, 1, 0, 5));
-		
+
 		JButton btnVerTodos = new JButton("Ver Todos");
 		btnVerTodos.setFont(Fronteira.FONT_COMPONENTES);
 		btnVerTodos.addActionListener(new ActionListener()
@@ -245,14 +245,14 @@ public class FronteiraManterCategorias extends JPanel implements IFronteira
 	{
 		if (tfCodigo.getText().length() == 0)
 			throw new FronteiraException("Código em branco.");
-		
+
 		Categoria categoria = new Categoria();
 		categoria.setCodigo(tfCodigo.getText());
 		categoria.setTema(tfTema.getText());
-		
+
 		return categoria;
 	}
-	
+
 	public void callAdicionarCategoria()
 	{
 		try {
@@ -268,6 +268,7 @@ public class FronteiraManterCategorias extends JPanel implements IFronteira
 				MessageUtil.showInfo("Adicionar Categoria", "Categoria '%s' adicionada com êxtio!", categoria.getTema());
 				callLimparCampos();
 			}
+
 			else
 				MessageUtil.showWarning("Adicionar Categoria", "Não foi possível adicionar a categoria '%s'.", categoria.getTema());
 
@@ -310,7 +311,7 @@ public class FronteiraManterCategorias extends JPanel implements IFronteira
 			MessageUtil.showError("Atualizar Categoria", "Falha ao atualizar a categoria '%s'.\n- %s", categoria.getTema(), e.getMessage());
 		}
 	}
-	
+
 	private void callExcluirCategoria()
 	{
 		if (categoria == null)
@@ -379,15 +380,19 @@ public class FronteiraManterCategorias extends JPanel implements IFronteira
 		tfTema.setText("");
 		
 		categoria = null;
+
+		btnAdicionar.setEnabled(true);
+		btnAtualizar.setEnabled(false);
+		btnExcluir.setEnabled(false);
 	}
 	
 	private void callSelecionarCategoria()
 	{
 		categoria = model.getLinha(tableConsulta.getSelectedRow());
-		
+
 		tfCodigo.setText(categoria.getCodigo());
 		tfTema.setText(categoria.getTema());
-		
+
 		btnAdicionar.setEnabled(false);
 		btnAtualizar.setEnabled(true);
 		btnExcluir.setEnabled(true);

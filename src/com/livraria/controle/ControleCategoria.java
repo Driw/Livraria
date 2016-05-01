@@ -47,13 +47,13 @@ public class ControleCategoria
 
 	public boolean excluir(Categoria categoria) throws SQLException
 	{
-		String sql = "DROP * FROM livros_categorias WHERE cdu = ?";
+		String sql = "DELETE FROM livros_categorias WHERE categoria = ?";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
 		ps.setInt(1, categoria.getID());
 		ps.executeUpdate();
 
-		sql = "DROP * FROM categorias WHERE id = ?";
+		sql = "DELETE FROM categorias WHERE id = ?";
 
 		ps = connection.prepareStatement(sql);
 		ps.setInt(1, categoria.getID());

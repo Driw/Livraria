@@ -1,5 +1,5 @@
 
-CREATE TABLE cdus
+CREATE TABLE categorias
 (
 	id INT NOT NULL AUTO_INCREMENT,
 	codigo VARCHAR(9) NOT NULL,
@@ -30,11 +30,11 @@ CREATE TABLE livros
 CREATE TABLE livros_categorias
 (
 	livro INT,
-	cdu INT,
+	categoria INT,
 
-	PRIMARY KEY (livro, cdu),
+	PRIMARY KEY (livro, categoria),
 	FOREIGN KEY (livro) REFERENCES livros (id),
-	FOREIGN KEY (cdu) REFERENCES cdus (id)
+	FOREIGN KEY (categoria) REFERENCES categorias (id)
 )
 
 CREATE TABLE editoras

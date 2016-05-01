@@ -321,7 +321,7 @@ public class FronteiraManterCategorias extends JPanel implements IFronteira
 
 		try {
 
-			if (controleCategoria.excluir(categoria.getID()))
+			if (controleCategoria.excluir(categoria))
 			{
 				model.remover(categoria);
 
@@ -399,7 +399,7 @@ public class FronteiraManterCategorias extends JPanel implements IFronteira
 
 			Categoria categoria = model.getLinha(tableConsulta.getSelectedRow());
 			
-			if (controleCategoria.excluir(categoria.getID()))
+			if (controleCategoria.excluir(categoria))
 			{
 				model.removerLinha(tableConsulta.getSelectedRow());
 				callLimparCampos();

@@ -33,8 +33,8 @@ public class ComponentUtil
 	public static void setDataMask(JFormattedTextField textField)
 	{
 		try {
-			MaskFormatter dataMask = new MaskFormatter("##/##/####");
-			textField.setFormatterFactory(new DefaultFormatterFactory(dataMask));
+			MaskFormatter mask = new MaskFormatter("##/##/####");
+			textField.setFormatterFactory(new DefaultFormatterFactory(mask));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -44,8 +44,8 @@ public class ComponentUtil
 	public static void setFoneMask(JFormattedTextField textField)
 	{
 		try {
-			MaskFormatter dataMask = new MaskFormatter("(##) ####-####");
-			textField.setFormatterFactory(new DefaultFormatterFactory(dataMask));
+			MaskFormatter mask = new MaskFormatter("(##) ####-####");
+			textField.setFormatterFactory(new DefaultFormatterFactory(mask));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -54,8 +54,8 @@ public class ComponentUtil
 	public static void setCnpjMask(JFormattedTextField textField)
 	{
 		try {
-			MaskFormatter dataMask = new MaskFormatter("##.###.###/####-##");
-			textField.setFormatterFactory(new DefaultFormatterFactory(dataMask));
+			MaskFormatter mask = new MaskFormatter("##.###.###/####-##");
+			textField.setFormatterFactory(new DefaultFormatterFactory(mask));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -64,8 +64,18 @@ public class ComponentUtil
 	public static void setValueMask(JFormattedTextField textField)
 	{
 		try {
-			MaskFormatter dataMask = new MaskFormatter("###,##");
-			textField.setFormatterFactory(new DefaultFormatterFactory(dataMask));
+			MaskFormatter mask = new MaskFormatter("R$ ###,##");
+			textField.setFormatterFactory(new DefaultFormatterFactory(mask));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void setIsbnMask(JFormattedTextField textField)
+	{
+		try {
+			MaskFormatter mask = new MaskFormatter("###-#-##-######-#");
+			textField.setFormatterFactory(new DefaultFormatterFactory(mask));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -118,5 +128,30 @@ public class ComponentUtil
 		};
 
 		return String.format("(%s) %s-%s", partes[0], partes[1], partes[2]);
+	}
+
+	public static String isbnClear(String isbn)
+	{
+		if (isbn == null)
+			return null;
+
+		return isbn.replace("-", "");
+	}
+
+	public static String isbnFormmat(String isbn)
+	{
+		if (isbn == null)
+			return null;
+
+		String partes[] =
+		{
+			StringUtil.sub(isbn, 0, 3),
+			StringUtil.sub(isbn, 3, 1),
+			StringUtil.sub(isbn, 4, 2),
+			StringUtil.sub(isbn, 6, 6),
+			StringUtil.sub(isbn, 12, 1),
+		};
+
+		return String.format("%s-%s-%s-%s-%s", partes[0], partes[1], partes[2], partes[3], partes[4]);
 	}
 }

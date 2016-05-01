@@ -29,6 +29,8 @@ import org.diverproject.util.MessageUtil;
 
 import com.livraria.controle.ControleEditora;
 import com.livraria.entidades.Editora;
+import com.livraria.fronteira.model.ModelManterEditoras;
+import com.livraria.fronteira.popup.PopUpVerLivros;
 import com.livraria.util.ComponentUtil;
 import com.livraria.util.FronteiraException;
 

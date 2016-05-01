@@ -89,4 +89,13 @@ public class ModelListarCategorias extends DefaultTableModel
 		categorias.add(categoria);
 		fireTableDataChanged();
 	}
+
+	public void apagar(int linha)
+	{
+		if (linha >= 0 && linha < categorias.size())
+		{
+			categorias.remove(linha);
+			fireTableDataChanged();
+		}
+	}
 }

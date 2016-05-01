@@ -2,6 +2,7 @@ package com.livraria.fronteira.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.table.DefaultTableModel;
 
@@ -63,7 +64,7 @@ public class ModelManterLivros extends DefaultTableModel
 			{
 				case COLUNA_ISBN: return ComponentUtil.isbnFormmat(livro.getIsbn());
 				case COLUNA_TITULO: return livro.getTitulo();
-				case COLUNA_PRECO: return String.format("R$ %3.2f", livro.getPreco());
+				case COLUNA_PRECO: return String.format(Locale.US, "R$ %3.2f", livro.getPreco());
 				case COLUNA_PAGINAS: return livro.getPaginas();
 				case COLUNA_EDITORA: return livro.getEditora().getNome();
 			}

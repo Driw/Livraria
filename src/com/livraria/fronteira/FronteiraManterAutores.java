@@ -32,6 +32,8 @@ import org.diverproject.util.MessageUtil;
 
 import com.livraria.controle.ControleAutor;
 import com.livraria.entidades.Autor;
+import com.livraria.fronteira.model.ModelManterAutores;
+import com.livraria.fronteira.popup.PopUpVerLivros;
 import com.livraria.util.ComponentUtil;
 
 @SuppressWarnings("serial")
@@ -155,7 +157,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 				callAdicionarAutor();
 			}
 		});
-		btnAdicionar.setToolTipText("Adicionar irá registrar um novo autor com as informações abaixo.");
+		btnAdicionar.setToolTipText("Adicionar irá registrar um novo autor com as informações ao lado.");
 		panelDadosAcoes.add(btnAdicionar);
 
 		btnAtualizar = new JButton("Atualizar");

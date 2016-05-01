@@ -126,4 +126,33 @@ public class Livro
 	{
 		return categorias == null ? (categorias = new LivroCategorias()) : categorias;
 	}
+
+	public void copiar(Livro livro)
+	{
+		this.isbn = livro.isbn;
+		this.titulo = livro.titulo;
+		this.preco = livro.preco;
+		this.publicacao = livro.publicacao;
+		this.paginas = livro.paginas;
+		this.capa = livro.capa;
+		this.resumo = livro.resumo;
+		this.sumario = livro.sumario;
+		this.editora = livro.editora;
+
+		if (this.autores != null)
+		{
+			this.autores.limpar();
+
+			for (Autor autor : livro.autores.listar())
+				this.autores.adicionar(autor);
+		}
+
+		if (this.categorias != null)
+		{
+			this.categorias.limpar();
+
+			for (Categoria categoria : livro.categorias.listar())
+				this.categorias.adicionar(categoria);
+		}
+	}
 }

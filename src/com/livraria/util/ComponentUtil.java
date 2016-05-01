@@ -30,6 +30,19 @@ public class ComponentUtil
 		};
 	}
 
+	public static KeyListener keyListenerNumerico()
+	{
+		return new KeyAdapter()
+		{
+			@Override
+			public void keyTyped(KeyEvent e)
+			{
+				if (e.getKeyChar() < '0' || e.getKeyChar() > '9')
+					e.consume();
+			}
+		};
+	}
+
 	public static void setDataMask(JFormattedTextField textField)
 	{
 		try {
@@ -64,7 +77,9 @@ public class ComponentUtil
 	public static void setValueMask(JFormattedTextField textField)
 	{
 		try {
-			MaskFormatter mask = new MaskFormatter("R$ ###,##");
+			MaskFormatter mask = new MaskFormatter("R$ ###.##");
+			mask.setValidCharacters("0123456789");
+			mask.setPlaceholderCharacter('0');
 			textField.setFormatterFactory(new DefaultFormatterFactory(mask));
 		} catch (ParseException e) {
 			e.printStackTrace();

@@ -87,7 +87,7 @@ public class ControleLivro
 
 		Date publicacao = new Date(livro.getPublicacao().getTime());
 
-		String sql = "UPDATE livros SET isbn = ?, titulo = ?, editora = ?, preco = ?, publicacao = ?"
+		String sql = "UPDATE livros SET isbn = ?, titulo = ?, editora = ?, preco = ?, publicacao = ?,"
 					+" paginas = ?, capa = ?, resumo = ?, sumario = ?"
 					+" WHERE id = ?";
 
@@ -270,11 +270,9 @@ public class ControleLivro
 
 	public List<Livro> filtrarPorISBN(String isbn) throws SQLException
 	{
-		String sql = "SELECT * FROM livros WHERE isbn LIKE '?%'";
+		String sql = "SELECT * FROM livros WHERE isbn LIKE '" +isbn+ "%'";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
-		ps.setString(1, isbn);
-
 		ResultSet rs = ps.executeQuery();
 
 		return concluirFiltragem(rs);
@@ -282,11 +280,9 @@ public class ControleLivro
 
 	public List<Livro> filtrarPorTitulo(String titulo) throws SQLException
 	{
-		String sql = "SELECT * FROM livros WHERE titulo LIKE '%?%'";
+		String sql = "SELECT * FROM livros WHERE titulo LIKE '%" +titulo+ "%'";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
-		ps.setString(1, titulo);
-
 		ResultSet rs = ps.executeQuery();
 
 		return concluirFiltragem(rs);
@@ -294,11 +290,9 @@ public class ControleLivro
 
 	public List<Livro> filtrarPorResumo(String resumo) throws SQLException
 	{
-		String sql = "SELECT * FROM livros WHERE resumo LIKE '%?%'";
+		String sql = "SELECT * FROM livros WHERE resumo LIKE '%" +resumo+ "%'";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
-		ps.setString(1, resumo);
-
 		ResultSet rs = ps.executeQuery();
 
 		return concluirFiltragem(rs);
@@ -306,11 +300,9 @@ public class ControleLivro
 
 	public List<Livro> filtrarPorSumario(String sumario) throws SQLException
 	{
-		String sql = "SELECT * FROM livros WHERE sumario LIKE '%?%'";
+		String sql = "SELECT * FROM livros WHERE sumario LIKE '%" +sumario+ "%'";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
-		ps.setString(1, sumario);
-
 		ResultSet rs = ps.executeQuery();
 
 		return concluirFiltragem(rs);

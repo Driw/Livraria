@@ -25,7 +25,7 @@ import org.diverproject.util.MessageUtil;
 
 import com.livraria.controle.ControleCategoria;
 import com.livraria.entidades.Categoria;
-
+import com.livraria.fronteira.model.ModelManterCategorias;
 import com.livraria.util.FronteiraException;
 
 @SuppressWarnings("serial")

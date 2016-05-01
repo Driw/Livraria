@@ -89,4 +89,13 @@ public class ModelListarAutores extends DefaultTableModel
 		autores.add(autor);
 		fireTableDataChanged();
 	}
+
+	public void apagar(int linha)
+	{
+		if (linha >= 0 && linha < autores.size())
+		{
+			autores.remove(linha);
+			fireTableDataChanged();
+		}
+	}
 }

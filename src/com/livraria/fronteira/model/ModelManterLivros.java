@@ -1,4 +1,4 @@
-package com.livraria.fronteira;
+package com.livraria.fronteira.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,25 +6,25 @@ import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
 import com.livraria.entidades.Livro;
+import com.livraria.util.ComponentUtil;
 
 @SuppressWarnings("serial")
 public class ModelManterLivros extends DefaultTableModel
 {
-	private static final int COLUNA_ISBN = 1;
-	private static final int COLUNA_TITULO = 2;
-	private static final int COLUNA_PRECO = 3;
-	private static final int COLUNA_PAGINAS = 4;
-	private static final int COLUNA_EDITORA = 5;
-	private static final int COLUNA_PRIMEIRO_AUTOR = 6;
+	private static final int COLUNA_ISBN = 0;
+	private static final int COLUNA_TITULO = 1;
+	private static final int COLUNA_PRECO = 2;
+	private static final int COLUNA_PAGINAS = 3;
+	private static final int COLUNA_EDITORA = 4;
 
 	private static final String COLUNS[] = new String[]
 	{
-		"ISBN", "Nome", "Preço", "Pag.", "Editora", "Primeiro Autor"
+		"ISBN", "Nome", "Preço", "Pag.", "Editora"
 	};
 
 	private static final Class<?> COLUNS_TYPE[] = new Class[]
 	{
-		String.class, String.class, Float.class, Integer.class, String.class, String.class
+		String.class, String.class, String.class, Integer.class, String.class, String.class
 	};
 
 	private List<Livro> livros = new ArrayList<Livro>();
@@ -61,12 +61,11 @@ public class ModelManterLivros extends DefaultTableModel
 		if (livro != null)
 			switch (column)
 			{
-				case COLUNA_ISBN: livro.getIsbn();
-				case COLUNA_TITULO: livro.getTitulo();
-				case COLUNA_PRECO: livro.getPreco();
-				case COLUNA_PAGINAS: livro.getPaginas();
-				case COLUNA_EDITORA: livro.getEditora().getNome();
-				case COLUNA_PRIMEIRO_AUTOR: livro.getLivroAutores().obter(0);
+				case COLUNA_ISBN: return ComponentUtil.isbnFormmat(livro.getIsbn());
+				case COLUNA_TITULO: return livro.getTitulo();
+				case COLUNA_PRECO: return String.format("R$ %3.2f", livro.getPreco());
+				case COLUNA_PAGINAS: return livro.getPaginas();
+				case COLUNA_EDITORA: return livro.getEditora().getNome();
 			}
 
 		return null;
@@ -95,5 +94,10 @@ public class ModelManterLivros extends DefaultTableModel
 		livros = lista;
 
 		fireTableDataChanged();
+	}
+
+	public void remover(Livro livro)
+	{
+		livros.remove(livro);
 	}
 }

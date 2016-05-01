@@ -1,4 +1,4 @@
-package com.livraria.fronteira;
+package com.livraria.fronteira.popup;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -7,6 +7,7 @@ import com.livraria.controle.ControleLivro;
 import com.livraria.entidades.Autor;
 import com.livraria.entidades.Editora;
 import com.livraria.entidades.Livro;
+import com.livraria.fronteira.model.ModelPopUpVerLivros;
 
 import java.sql.SQLException;
 import java.util.List;

@@ -1,20 +1,20 @@
-package com.livraria.fronteira;
+package com.livraria.fronteira.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.table.DefaultTableModel;
 
-import com.livraria.entidades.Categoria;
+import com.livraria.entidades.Autor;
 
 @SuppressWarnings("serial")
-public class ModelListarCategorias extends DefaultTableModel
+public class ModelListarAutores extends DefaultTableModel
 {
-	private static final int COLUNA_Tema = 1;
+	private static final int COLUNA_NOME = 0;
 
 	private static final String COLUNS[] = new String[]
 	{
-		"Tema"
+		"Nome"
 	};
 
 	private static final Class<?> COLUNS_TYPE[] = new Class[]
@@ -22,7 +22,7 @@ public class ModelListarCategorias extends DefaultTableModel
 		String.class
 	};
 
-	private List<Categoria> autores = new ArrayList<Categoria>();
+	private List<Autor> autores = new ArrayList<Autor>();
 
 	@Override
 	public Class<?> getColumnClass(int column)
@@ -51,12 +51,12 @@ public class ModelListarCategorias extends DefaultTableModel
 	@Override
 	public Object getValueAt(int row, int column)
 	{
-		Categoria autor = autores.get(row);
+		Autor autor = autores.get(row);
 
 		if (autor != null)
 			switch (column)
 			{
-				case COLUNA_Tema: return autor.getTema();
+				case COLUNA_NOME: return autor.getNome();
 			}
 
 		return null;
@@ -68,15 +68,25 @@ public class ModelListarCategorias extends DefaultTableModel
 		return false;
 	}
 
-	public Categoria getLinha(int linha)
+	public Autor getLinha(int linha)
 	{
 		return autores.get(linha);
 	}
 
-	public void atualizarLista(List<Categoria> lista)
+	public void atualizarLista(List<Autor> lista)
 	{
 		autores = lista;
 
+		fireTableDataChanged();
+	}
+
+	public void adicionar(Autor autor)
+	{
+		for (Autor a : autores)
+			if (a.getID() == autor.getID())
+				return;
+
+		autores.add(autor);
 		fireTableDataChanged();
 	}
 }

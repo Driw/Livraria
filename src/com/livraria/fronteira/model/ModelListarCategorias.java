@@ -1,20 +1,20 @@
-package com.livraria.fronteira;
+package com.livraria.fronteira.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.table.DefaultTableModel;
 
-import com.livraria.entidades.Autor;
+import com.livraria.entidades.Categoria;
 
 @SuppressWarnings("serial")
-public class ModelListarAutores extends DefaultTableModel
+public class ModelListarCategorias extends DefaultTableModel
 {
-	private static final int COLUNA_NOME = 1;
+	private static final int COLUNA_TEMA = 0;
 
 	private static final String COLUNS[] = new String[]
 	{
-		"Nome"
+		"Tema"
 	};
 
 	private static final Class<?> COLUNS_TYPE[] = new Class[]
@@ -22,7 +22,7 @@ public class ModelListarAutores extends DefaultTableModel
 		String.class
 	};
 
-	private List<Autor> autores = new ArrayList<Autor>();
+	private List<Categoria> categorias = new ArrayList<Categoria>();
 
 	@Override
 	public Class<?> getColumnClass(int column)
@@ -45,18 +45,18 @@ public class ModelListarAutores extends DefaultTableModel
 	@Override
 	public int getRowCount()
 	{
-		return autores == null ? 0 : autores.size();
+		return categorias == null ? 0 : categorias.size();
 	}
 
 	@Override
 	public Object getValueAt(int row, int column)
 	{
-		Autor autor = autores.get(row);
+		Categoria categoria = categorias.get(row);
 
-		if (autor != null)
+		if (categoria != null)
 			switch (column)
 			{
-				case COLUNA_NOME: return autor.getNome();
+				case COLUNA_TEMA: return categoria.getTema();
 			}
 
 		return null;
@@ -68,15 +68,25 @@ public class ModelListarAutores extends DefaultTableModel
 		return false;
 	}
 
-	public Autor getLinha(int linha)
+	public Categoria getLinha(int linha)
 	{
-		return autores.get(linha);
+		return categorias.get(linha);
 	}
 
-	public void atualizarLista(List<Autor> lista)
+	public void atualizarLista(List<Categoria> lista)
 	{
-		autores = lista;
+		categorias = lista;
 
+		fireTableDataChanged();
+	}
+
+	public void adicionar(Categoria categoria)
+	{
+		for (Categoria c : categorias)
+			if (c.getID() == categoria.getID())
+				return;
+
+		categorias.add(categoria);
 		fireTableDataChanged();
 	}
 }

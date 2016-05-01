@@ -1,4 +1,4 @@
-package com.livraria.fronteira;
+package com.livraria.fronteira.model;
 
 import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;

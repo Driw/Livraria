@@ -1,7 +1,5 @@
 package com.livraria.entidades;
 
-import java.util.Date;
-
 public class Categoria
 {
 	private int id;

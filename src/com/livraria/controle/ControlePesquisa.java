@@ -25,17 +25,16 @@ public class ControlePesquisa
 
 	public List<Livro> pesquisarPorCategoria(String categoria, int quantidade) throws SQLException
 	{
-		String sql = "SELECT livros.id, livros.isbn, livros.titulo, livros.editora, livros.preco,"
-					+" livros.publicacao, livros.paginas, livros.capa, livros.resumo, livros.sumario"
-					+" FROM livros"
-					+" INNER JOIN livros_categorias ON livros_categorias.livro = livros.id"
-					+" INNER JOIN categorias ON categorias.id = livros_categorias.cdu"
-					+" WHERE categorias.tema LIKE '%?%'";
+		String sql = "SELECT livros.id, livros.isbn, livros.titulo, livros.editora, livros.preco, "
+					+"livros.publicacao, livros.paginas, livros.capa, livros.resumo, livros.sumario "
+					+"FROM livros "
+					+"INNER JOIN livros_categorias ON livros_categorias.livro = livros.id "
+					+"INNER JOIN categorias ON categorias.id = livros_categorias.categoria "
+					+"WHERE categorias.tema LIKE '%" +categoria+ "%' LIMIT 0, 20";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
-		ps.setString(1, categoria);
-
 		ResultSet rs = ps.executeQuery();
+
 		List<Livro> pesquisado = filtrarResultado(rs);
 
 		return pesquisado;
@@ -43,17 +42,16 @@ public class ControlePesquisa
 
 	public List<Livro> pesquisarPorAutor(String autor, int quantidade) throws SQLException
 	{
-		String query = "SELECT livros.id, livros.isbn, livros.titulo, livros.editora, livros.preco,"
-				+" livros.publicacao, livros.paginas, livros.capa, livros.resumo, livros.sumario"
-				+" FROM livros"
-				+" INNER JOIN livros_autores ON livros_autores.livro = livros.id"
-				+" INNER JOIN autores ON autores.id = livros_autores.autor"
-				+" WHERE autores.nome LIKE '%?%'";
+		String sql = "SELECT livros.id, livros.isbn, livros.titulo, livros.editora, livros.preco, "
+					+"livros.publicacao, livros.paginas, livros.capa, livros.resumo, livros.sumario "
+					+"FROM livros "
+					+"INNER JOIN livros_autores ON livros_autores.livro = livros.id "
+					+"INNER JOIN autores ON autores.id = livros_autores.autor "
+					+"WHERE autores.nome LIKE '%" +autor+ "%' LIMIT 0, 20";
 
-		PreparedStatement ps = connection.prepareStatement(query);
-		ps.setString(1, autor);
-
+		PreparedStatement ps = connection.prepareStatement(sql);
 		ResultSet rs = ps.executeQuery();
+
 		List<Livro> pesquisado = filtrarResultado(rs);
 
 		return pesquisado;
@@ -61,12 +59,11 @@ public class ControlePesquisa
 
 	public List<Livro> pesquisarPorTitulo(String titulo, int quantidade) throws SQLException
 	{
-		String query = "SELECT * FROM livros WHERE titulo LIKE '%?%'";
+		String sql = "SELECT * FROM livros WHERE titulo LIKE '%" +titulo+ "%' LIMIT 0, 20";
 
-		PreparedStatement ps = connection.prepareStatement(query);
-		ps.setString(1, titulo);
-
+		PreparedStatement ps = connection.prepareStatement(sql);
 		ResultSet rs = ps.executeQuery();
+
 		List<Livro> pesquisado = filtrarResultado(rs);
 
 		return pesquisado;
@@ -74,16 +71,15 @@ public class ControlePesquisa
 
 	public List<Livro> pesquisarPorEditora(String editora, int quantidade) throws SQLException
 	{
-		String query = "SELECT livros.id, livros.isbn, livros.titulo, livros.editora, livros.preco,"
-				+" livros.publicacao, livros.paginas, livros.capa, livros.resumo, livros.sumario"
-				+" FROM livros"
-				+" INNER JOIN editoras ON editoras.id = livros.editora"
-				+" WHERE editoras.nome LIKE '%?%'";
+		String sql = "SELECT livros.id, livros.isbn, livros.titulo, livros.editora, livros.preco, "
+					+"livros.publicacao, livros.paginas, livros.capa, livros.resumo, livros.sumario "
+					+"FROM livros "
+					+"INNER JOIN editoras ON editoras.id = livros.editora "
+					+"WHERE editoras.nome LIKE '%" +editora+ "%' LIMIT 0, 20";
 
-		PreparedStatement ps = connection.prepareStatement(query);
-		ps.setString(1, editora);
-
+		PreparedStatement ps = connection.prepareStatement(sql);
 		ResultSet rs = ps.executeQuery();
+
 		List<Livro> pesquisado = filtrarResultado(rs);
 
 		return pesquisado;

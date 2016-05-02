@@ -15,8 +15,11 @@ import javax.swing.JButton;
 @SuppressWarnings("serial")
 public class FronteiraInicial extends JPanel
 {
+	private static final JPanel INSTANCE = new FronteiraInicial();
+
 	private JTextField tfLogin;
 	private JPasswordField tfSenha;
+
 	public FronteiraInicial()
 	{
 		setSize(400, 200);
@@ -62,5 +65,10 @@ public class FronteiraInicial extends JPanel
 
 		JButton btnRecuperarSenha = new JButton("Recuperar Senha");
 		panelAcoes.add(btnRecuperarSenha);
+	}
+
+	public static JPanel getInstance()
+	{
+		return INSTANCE;
 	}
 }

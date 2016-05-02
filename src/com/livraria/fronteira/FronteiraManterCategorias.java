@@ -31,6 +31,8 @@ import com.livraria.util.FronteiraException;
 @SuppressWarnings("serial")
 public class FronteiraManterCategorias extends JPanel implements IFronteira
 {
+	private static final JPanel INSTANCE = new FronteiraManterCategorias();
+
 	private static final int FILTRO_CODIGO = 0;
 	private static final int FILTRO_TEMA = 1;
 
@@ -418,5 +420,10 @@ public class FronteiraManterCategorias extends JPanel implements IFronteira
 		} catch (SQLException e) {
 			MessageUtil.showError("Excluir Categoria", "Falha ao excluir a categoria '%s'.\n- %s", categoria.getTema(), e.getMessage());
 		}
+	}
+
+	public static JPanel getInstance()
+	{
+		return INSTANCE;
 	}
 }

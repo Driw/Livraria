@@ -8,6 +8,7 @@ import java.awt.Container;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Field;
 
 import javax.swing.JFrame;
 
@@ -211,9 +212,20 @@ public class Fronteira
 	{
 		try {
 
-			Object instancia = classe.newInstance();
+			Object instancia = null;
 
-			if (instancia instanceof JPanel)
+			for (Field field : classe.getDeclaredFields())
+			{
+				field.setAccessible(true);
+
+				if (field.getName().equals("INSTANCE"))
+					instancia = field.get(null);
+			}
+
+			if (instancia == null)
+				showError("Fronteira", "%s não possui instancia", classe.getSimpleName());
+
+			else if (instancia instanceof JPanel)
 			{
 				JPanel panel = (JPanel) instancia;
 
@@ -222,9 +234,9 @@ public class Fronteira
 			}
 
 			else
-				showError("Fronteira", "%s não é válido", classe.getSimpleName());
+				showError("Fronteira", "%s não é um JPanel", classe.getSimpleName());
 
-		} catch (InstantiationException | IllegalAccessException e) {
+		} catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
 			showException(e);
 		}
 	}

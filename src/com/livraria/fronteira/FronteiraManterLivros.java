@@ -60,6 +60,8 @@ import com.livraria.util.FronteiraException;
 @SuppressWarnings("serial")
 public class FronteiraManterLivros extends JPanel implements IFronteira
 {
+	private static final JPanel INSTANCE = new FronteiraManterLivros();
+
 	private static final int FILTRO_ISBN = 0;
 	private static final int FILTRO_TITULO = 1;
 	private static final int FILTRO_RESUMO = 2;
@@ -989,5 +991,10 @@ public class FronteiraManterLivros extends JPanel implements IFronteira
 		} catch (SQLException e) {
 			MessageUtil.die(e);
 		}
+	}
+
+	public static JPanel getInstance()
+	{
+		return INSTANCE;
 	}
 }

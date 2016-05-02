@@ -79,7 +79,10 @@ public class Carrinho
 	{
 		for (CarrinhoItem item : items)
 			if (item.getLivro().equals(livro))
+			{
 				item.aumentarQuantidade(quantidade);
+				return;
+			}
 
 		CarrinhoItem item = new CarrinhoItem();
 		item.setLivro(livro);

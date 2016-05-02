@@ -77,7 +77,7 @@ CREATE TABLE carrinhos
 (
 	id INT AUTO_INCREMENT,
 	criado DATE NOT NULL,
-	concluido DATE NOT NULL,
+	concluido DATE,
 	estado INT NOT NULL,
 
 	PRIMARY KEY (id)

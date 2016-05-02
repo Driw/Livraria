@@ -127,6 +127,19 @@ public class Livro
 		return categorias == null ? (categorias = new LivroCategorias()) : categorias;
 	}
 
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof Livro)
+		{
+			Livro livro = (Livro) obj;
+
+			return livro.id == id;
+		}
+
+		return false;
+	}
+
 	public void copiar(Livro livro)
 	{
 		this.isbn = livro.isbn;

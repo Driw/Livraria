@@ -1,22 +1,22 @@
 package com.livraria.controle;
 
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import org.diverproject.util.sql.MySQL;
 
 import com.livraria.Conexao;
 import com.livraria.entidades.Carrinho;
+import com.livraria.entidades.Livro;
 
 public class ControleCarrinho
 {
 	private static final Connection connection;
+	private static Carrinho carrinho;
 
 	static
 	{
@@ -24,26 +24,47 @@ public class ControleCarrinho
 		connection = mysql.getConnection();
 	}
 
-	public Carrinho criar() throws SQLException, NoSuchAlgorithmException
+	public Carrinho criar() throws SQLException
 	{
-		int numeroPedido = gerarNumeroPedido(1);
+		Carrinho carrinho = recuperar();
+
+		if (carrinho != null)
+			return carrinho;
+
 		int estado = Carrinho.CARRINHO_CRIADO;
 		Date criado = new Date(System.currentTimeMillis());
 
-		String query = "INSERT INTO carrinhos (id, criado, concluido, estado) VALUES (?, ?, ?)";
+		String query = "INSERT INTO carrinhos (criado, concluido, estado) VALUES (?, ?, ?)";
 
 		PreparedStatement ps = connection.prepareStatement(query);
-		ps.setInt(1, numeroPedido);
-		ps.setDate(2, new java.sql.Date(criado.getTime()));
-		ps.setDate(3, null);
-		ps.setInt(4, estado);
+		ps.setDate(1, criado);
+		ps.setDate(2, null);
+		ps.setInt(3, estado);
 
-		Carrinho carrinho = selecionarPorPedido(numeroPedido);
+		if (ps.executeUpdate() == Conexao.INSERT_SUCCESSFUL)
+			return recuperar();
+
+		throw new SQLException("não foi possível criar o carrinho");
+	}
+
+	public Carrinho recuperar() throws SQLException
+	{
+		String query = "SELECT * FROM carrinhos WHERE (estado = ? OR estado = ?) ORDER BY id ASC";
+
+		PreparedStatement ps = connection.prepareStatement(query);
+		ps.setInt(1, Carrinho.CARRINHO_CRIADO);
+		ps.setInt(2, Carrinho.CARRINHO_EM_ESPERA);
+
+		ResultSet rs = ps.executeQuery();
+		Carrinho carrinho = null;
+
+		if (rs.next())
+			carrinho = criar(rs);
 
 		return carrinho;
 	}
 
-	public Carrinho recuperar(int id) throws SQLException
+	public Carrinho carregar(int id) throws SQLException
 	{
 		String query = "SELECT * FROM carrinhos WHERE id = ?";
 
@@ -51,7 +72,10 @@ public class ControleCarrinho
 		ps.setInt(1, id);
 
 		ResultSet rs = ps.executeQuery();
-		Carrinho carrinho = filtrarResultado(rs);
+		Carrinho carrinho = null;
+
+		if (rs.next())
+			carrinho = criar(rs);
 
 		return carrinho;
 	}
@@ -61,31 +85,23 @@ public class ControleCarrinho
 		String query = "UPDATE carrinhos SET concluido = ?, estado = ?";
 
 		PreparedStatement ps = connection.prepareStatement(query);
-		ps.setDate(1, new java.sql.Date(carrinho.getConcluido().getTime()));
-		ps.setInt(2, carrinho.getEstado());
+		ps.setDate(1, new Date(carrinho.getConcluido().getTime()));
+		ps.setInt(2, Carrinho.CARRINHO_EM_ESPERA);
 
-		if (ps.executeUpdate() == PreparedStatement.EXECUTE_FAILED)
-			throw new SQLException("falha ao guardar carrinho");
+		if (ps.executeUpdate() == Conexao.UPDATE_SUCCESSFUL)
+		{
+			carrinho.setEstado(Carrinho.CARRINHO_EM_ESPERA);
 
-		removerItens(carrinho);
+			if (!removerItens(carrinho))
+				throw new SQLException("falha ao varrer carrinho");
 
-		if (!guardarItens(carrinho))
-			throw new SQLException("falha ao guardar itens do carrinho");
+			if (!guardarItens(carrinho))
+				throw new SQLException("falha ao guardar carrinho");
 
-		return true;
-	}
+			return true;
+		}
 
-	public Carrinho selecionarPorPedido(int numeroPedido) throws SQLException
-	{
-		String query = "SELECT * FROM carrinhos WHERE id = ?";
-
-		PreparedStatement ps = connection.prepareStatement(query);
-		ps.setInt(1, numeroPedido);
-
-		ResultSet rs = ps.executeQuery();
-		Carrinho carrinho = filtrarResultado(rs);
-
-		return carrinho;
+		return false;
 	}
 
 	public boolean finalizarCompra(Carrinho Carrinho) throws SQLException
@@ -102,33 +118,17 @@ public class ControleCarrinho
 		return null;
 	}
 
-	private Carrinho filtrarResultado(ResultSet rs) throws SQLException
+	private Carrinho criar(ResultSet rs) throws SQLException
 	{
 		Carrinho carrinho = new Carrinho();
 		carrinho.setID(rs.getInt("id"));
 		carrinho.setCriado(new Date(rs.getDate("criado").getTime()));
-		carrinho.setConcluido(new Date(rs.getDate("concluido").getTime()));
 		carrinho.setEstado(rs.getInt("estado"));
 
+		if (rs.getDate("concluido") != null)
+			carrinho.setConcluido(new Date(rs.getDate("concluido").getTime()));
+
 		return carrinho;
-	}
-
-	private int gerarNumeroPedido(int clienteID) throws NoSuchAlgorithmException, SQLException
-	{
-		Random random = new Random();
-		int numeroPedido = 0;
-
-		do {
-
-			numeroPedido = random.nextInt(899999999);
-			numeroPedido += 100000000;
-
-			if (selecionarPorPedido(numeroPedido) != null)
-				numeroPedido = 0;
-
-		} while (numeroPedido == 0);
-
-		return numeroPedido;
 	}
 
 	private boolean guardarItens(Carrinho carrinho) throws SQLException
@@ -158,5 +158,29 @@ public class ControleCarrinho
 		ps.setInt(1, carrinho.getID());
 
 		return ps.executeUpdate() == Conexao.UPDATE_SUCCESSFUL;
+	}
+
+	public static void adicionar(int quantidade, Livro livro) throws ControleException, SQLException
+	{
+		Carrinho carrinho = getAtual();
+
+		if (quantidade < 1)
+			throw new ControleException("quantidade de livros inválida (quantidade: %d)", quantidade);
+
+		if (livro == null)
+			throw new ControleException("livro não selecionado");
+
+		carrinho.adicionar(quantidade, livro);
+	}
+
+	public static Carrinho getAtual() throws SQLException
+	{
+		if (carrinho == null)
+		{
+			ControleCarrinho controleCarrinho = new ControleCarrinho();
+			carrinho = controleCarrinho.criar();
+		}
+
+		return carrinho;
 	}
 }

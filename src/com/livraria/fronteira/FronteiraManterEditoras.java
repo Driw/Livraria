@@ -37,6 +37,8 @@ import com.livraria.util.FronteiraException;
 @SuppressWarnings("serial")
 public class FronteiraManterEditoras extends JPanel implements IFronteira
 {
+	private static final JPanel INSTANCE = new FronteiraManterEditoras();
+
 	private static final int FILTRO_NOME = 0;
 	private static final int FILTRO_ENDERECO = 1;
 	private static final int FILTRO_TELEFONE = 2;
@@ -598,5 +600,10 @@ public class FronteiraManterEditoras extends JPanel implements IFronteira
 			popup = new PopUpVerLivros(this);
 
 		popup.carregar(editora);
+	}
+
+	public static JPanel getInstance()
+	{
+		return INSTANCE;
 	}
 }

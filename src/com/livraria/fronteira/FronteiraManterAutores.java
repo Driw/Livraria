@@ -39,6 +39,8 @@ import com.livraria.util.ComponentUtil;
 @SuppressWarnings("serial")
 public class FronteiraManterAutores extends JPanel implements IFronteira
 {
+	private static final JPanel INSTANCE = new FronteiraManterAutores();
+
 	private static final int FILTRO_NOME = 0;
 	private static final int FILTRO_BIOGRAFIA = 1;
 	private static final int FILTRO_LOCAL_DA_MORTE = 2;
@@ -583,5 +585,10 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 			popup = new PopUpVerLivros(this);
 
 		popup.carregar(autor);
+	}
+
+	public static JPanel getInstance()
+	{
+		return INSTANCE;
 	}
 }

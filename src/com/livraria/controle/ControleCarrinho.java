@@ -11,12 +11,11 @@ import org.diverproject.util.sql.MySQL;
 
 import com.livraria.Conexao;
 import com.livraria.entidades.Carrinho;
-import com.livraria.entidades.Livro;
 
 public class ControleCarrinho
 {
 	private static final Connection connection;
-	private static Carrinho carrinho;
+	private Carrinho carrinhoAtual;
 
 	static
 	{
@@ -26,10 +25,10 @@ public class ControleCarrinho
 
 	public Carrinho criar() throws SQLException
 	{
-		Carrinho carrinho = recuperar();
+		carrinhoAtual = recuperar();
 
-		if (carrinho != null)
-			return carrinho;
+		if (carrinhoAtual != null)
+			return carrinhoAtual;
 
 		int estado = Carrinho.CARRINHO_CRIADO;
 		Date criado = new Date(System.currentTimeMillis());
@@ -42,7 +41,7 @@ public class ControleCarrinho
 		ps.setInt(3, estado);
 
 		if (ps.executeUpdate() == Conexao.INSERT_SUCCESSFUL)
-			return recuperar();
+			return (carrinhoAtual = recuperar());
 
 		throw new SQLException("não foi possível criar o carrinho");
 	}
@@ -160,27 +159,11 @@ public class ControleCarrinho
 		return ps.executeUpdate() == Conexao.UPDATE_SUCCESSFUL;
 	}
 
-	public static void adicionar(int quantidade, Livro livro) throws ControleException, SQLException
+	public Carrinho getCarrinho() throws SQLException
 	{
-		Carrinho carrinho = getAtual();
+		if (carrinhoAtual == null)
+			carrinhoAtual = criar();
 
-		if (quantidade < 1)
-			throw new ControleException("quantidade de livros inválida (quantidade: %d)", quantidade);
-
-		if (livro == null)
-			throw new ControleException("livro não selecionado");
-
-		carrinho.adicionar(quantidade, livro);
-	}
-
-	public static Carrinho getAtual() throws SQLException
-	{
-		if (carrinho == null)
-		{
-			ControleCarrinho controleCarrinho = new ControleCarrinho();
-			carrinho = controleCarrinho.criar();
-		}
-
-		return carrinho;
+		return carrinhoAtual;
 	}
 }

@@ -95,7 +95,11 @@ public class Carrinho
 	{
 		for (CarrinhoItem item : items)
 			if (item.getLivro().equals(livro))
-				return item.diminuirQuantidade(quantidade);
+				if (item.diminuirQuantidade(quantidade))
+					if (item.getQuantidade() == 0)
+						return items.remove(item);
+					else
+						return true;
 
 		return false;
 	}
@@ -120,5 +124,23 @@ public class Carrinho
 	public int getNumeroItens()
 	{
 		return items.size();
+	}
+
+	public CarrinhoItem getItem(int indice)
+	{
+		if (indice >= 0 && indice < items.size())
+			return items.get(indice);
+
+		return null;
+	}
+
+	public float calcularTotal()
+	{
+		float total = 0.0f;
+
+		for (CarrinhoItem item : items)
+			total += item.getLivro().getPreco() * item.getQuantidade();
+
+		return total;
 	}
 }

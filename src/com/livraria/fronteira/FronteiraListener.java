@@ -1,11 +1,18 @@
-package com.livraria;
+package com.livraria.fronteira;
 
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.sql.SQLException;
 
-public class JanelaListener implements WindowListener
+import org.diverproject.util.MessageUtil;
+
+import com.livraria.Conexao;
+import com.livraria.controle.ControleCarrinho;
+import com.livraria.entidades.Carrinho;
+
+public class FronteiraListener implements WindowListener
 {
-	private static final WindowListener INSTANCIA = new JanelaListener();
+	private static final WindowListener INSTANCIA = new FronteiraListener();
 
 	@Override
 	public void windowActivated(WindowEvent e)
@@ -24,8 +31,15 @@ public class JanelaListener implements WindowListener
 	@Override
 	public void windowClosing(WindowEvent e)
 	{
-		// TODO Auto-generated method stub
-		
+		try {
+
+			ControleCarrinho controleCarrinho = new ControleCarrinho();
+			Carrinho carrinho = controleCarrinho.getCarrinho();
+			controleCarrinho.guardar(carrinho);
+
+		} catch (SQLException ex) {
+			MessageUtil.showError("Libraria", "Não foi possível guardar seu carrinho de compras atual:\n- %s", ex.getMessage());
+		}
 	}
 
 	@Override
@@ -52,8 +66,7 @@ public class JanelaListener implements WindowListener
 	@Override
 	public void windowOpened(WindowEvent e)
 	{
-		// TODO Auto-generated method stub
-		
+		Conexao.getMySQL(); // Garantir conexão com o banco de dados
 	}
 
 	public static WindowListener getInstancia()

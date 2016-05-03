@@ -9,8 +9,8 @@ import org.diverproject.util.MessageUtil;
 import org.diverproject.util.lang.IntUtil;
 
 import com.livraria.controle.ControleCarrinho;
-import com.livraria.controle.ControleException;
 import com.livraria.controle.ControlePesquisa;
+import com.livraria.entidades.Carrinho;
 import com.livraria.entidades.Livro;
 import com.livraria.fronteira.model.ModelPesquisaResultados;
 
@@ -42,13 +42,17 @@ public class FronteiraPesquisarLivros extends JPanel
 
 	private static final int MAX_FILTRO = 50;
 
+	private ModelPesquisaResultados model;
+	private ControleCarrinho controleCarrinho;
+
 	private JTextField tfFiltro;
 	private JComboBox<String> cbFiltro;
-	private ModelPesquisaResultados model;
 	private JTable tableResultados;
 
 	private FronteiraPesquisarLivros()
 	{
+		controleCarrinho = new ControleCarrinho();
+
 		setSize(820, 470);
 		setLayout(null);
 
@@ -221,9 +225,14 @@ public class FronteiraPesquisarLivros extends JPanel
 
 		else
 			try {
-				ControleCarrinho.adicionar(quantidade, livro);
+
+
+				Carrinho carrinho = controleCarrinho.getCarrinho();
+				carrinho.adicionar(quantidade, livro);
+
 				MessageUtil.showInfo("Adicionar ao Carrinho", "Adicionado %dx '%s' ao carrinho.", quantidade, livro.getTitulo());
-			} catch (ControleException | SQLException e) {
+
+			} catch (SQLException e) {
 				MessageUtil.showError("Adicionar ao Carrinho", "Falha ao adicionar %dx '%s' ao carrinho:\n- %s", quantidade, livro.getTitulo(), e.getMessage());
 			}
 	}

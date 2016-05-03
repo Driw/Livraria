@@ -13,7 +13,6 @@ import java.lang.reflect.Field;
 import javax.swing.JFrame;
 
 import com.livraria.GerarMassaDeDados;
-import com.livraria.JanelaListener;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -156,7 +155,7 @@ public class Fronteira
 
 		JMenu mnRelatorios = new JMenu("Relatórios");
 		menuBar.add(mnRelatorios);
-		frame.addWindowListener(JanelaListener.getInstancia());
+		frame.addWindowListener(FronteiraListener.getInstancia());
 	}
 
 	private void callGerarMassaDeDados()

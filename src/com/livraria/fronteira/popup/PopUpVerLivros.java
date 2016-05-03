@@ -56,7 +56,7 @@ public class PopUpVerLivros extends JFrame
 		table.getColumnModel().getColumn(3).setMinWidth(70);
 		table.getColumnModel().getColumn(3).setMaxWidth(70);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		table.setRowSelectionAllowed(false);
+		table.setRowSelectionAllowed(true);
 
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setBounds(10, 11, 514, 229);

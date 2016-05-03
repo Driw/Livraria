@@ -164,6 +164,8 @@ public class FronteiraCarrinhoDeCompras extends JPanel
 			}
 		});
 		panel.add(btnLimparCarrinho);
+
+		callAtualizar();
 	}
 
 	private void callAtualizar()

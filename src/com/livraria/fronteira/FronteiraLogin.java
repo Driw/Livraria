@@ -13,14 +13,14 @@ import java.awt.GridLayout;
 import javax.swing.JButton;
 
 @SuppressWarnings("serial")
-public class FronteiraInicial extends JPanel
+public class FronteiraLogin extends JPanel
 {
-	private static final JPanel INSTANCE = new FronteiraInicial();
+	private static final JPanel INSTANCE = new FronteiraLogin();
 
 	private JTextField tfLogin;
 	private JPasswordField tfSenha;
 
-	public FronteiraInicial()
+	public FronteiraLogin()
 	{
 		setSize(400, 200);
 		setLayout(null);

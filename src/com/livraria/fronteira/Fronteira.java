@@ -174,7 +174,7 @@ public class Fronteira
 
 	private void callPaginaInicial()
 	{
-		setFronteira(FronteiraInicial.class);
+		setFronteira(FronteiraLogin.class);
 	}
 
 	private void callManterAutores()

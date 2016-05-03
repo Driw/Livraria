@@ -210,6 +210,13 @@ public class FronteiraPesquisarLivros extends JPanel
 	private void callAdicionarAoCarrinho()
 	{
 		Livro livro = model.getLinha(tableResultados.getSelectedRow());
+
+		if (livro == null)
+		{
+			MessageUtil.showInfo("Adicionar ao Carrinho", "Nenhum livro foi selecionado.");
+			return;
+		}
+
 		String input = MessageUtil.showInput("Adicionar ao Carrinho:", "Quantos livros '%s' você deseja:", livro.getTitulo());
 
 		if (input == null || input.isEmpty())

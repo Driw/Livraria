@@ -1,10 +1,9 @@
 package com.livraria;
 
-import com.livraria.fronteira.FronteiraInicial;
-
 import org.diverproject.util.SystemUtil;
 
 import com.livraria.fronteira.Fronteira;
+import com.livraria.fronteira.FronteiraPesquisarLivros;
 
 public class Principal
 {
@@ -13,7 +12,7 @@ public class Principal
 		SystemUtil.setWindowInterface();
 
 		Fronteira fronteira = Fronteira.getInstancia();
-		fronteira.setFronteira(FronteiraInicial.class);
+		fronteira.setFronteira(FronteiraPesquisarLivros.class);
 		fronteira.mostrar();
 	}
 }

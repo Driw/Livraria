@@ -86,7 +86,10 @@ public class ModelPesquisaResultados extends DefaultTableModel
 
 	public Livro getLinha(int linha)
 	{
-		return livros.get(linha);
+		if (linha >= 0 && linha < livros.size())
+			return livros.get(linha);
+
+		return null;
 	}
 
 	public void atualizarLista(List<Livro> lista)

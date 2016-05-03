@@ -11,11 +11,13 @@ import org.diverproject.util.sql.MySQL;
 
 import com.livraria.Conexao;
 import com.livraria.entidades.Carrinho;
+import com.livraria.entidades.CarrinhoItem;
+import com.livraria.entidades.Livro;
 
 public class ControleCarrinho
 {
 	private static final Connection connection;
-	private Carrinho carrinhoAtual;
+	private static Carrinho carrinhoAtual;
 
 	static
 	{
@@ -60,6 +62,9 @@ public class ControleCarrinho
 		if (rs.next())
 			carrinho = criar(rs);
 
+		if (carrinho != null)
+			carregarItens(carrinho);
+
 		return carrinho;
 	}
 
@@ -81,18 +86,23 @@ public class ControleCarrinho
 
 	public boolean guardar(Carrinho carrinho) throws SQLException
 	{
-		String query = "UPDATE carrinhos SET concluido = ?, estado = ?";
+		String query = "UPDATE carrinhos SET concluido = ?, estado = ? WHERE id = ?";
+
+		Date concluido = null;
+
+		if (carrinho.getConcluido() != null)
+			concluido = new Date(carrinho.getConcluido().getTime());
 
 		PreparedStatement ps = connection.prepareStatement(query);
-		ps.setDate(1, new Date(carrinho.getConcluido().getTime()));
+		ps.setDate(1, concluido);
 		ps.setInt(2, Carrinho.CARRINHO_EM_ESPERA);
+		ps.setInt(3, carrinho.getID());
 
 		if (ps.executeUpdate() == Conexao.UPDATE_SUCCESSFUL)
 		{
 			carrinho.setEstado(Carrinho.CARRINHO_EM_ESPERA);
 
-			if (!removerItens(carrinho))
-				throw new SQLException("falha ao varrer carrinho");
+			removerItens(carrinho);
 
 			if (!guardarItens(carrinho))
 				throw new SQLException("falha ao guardar carrinho");
@@ -132,31 +142,59 @@ public class ControleCarrinho
 
 	private boolean guardarItens(Carrinho carrinho) throws SQLException
 	{
+		if (carrinho.getNumeroItens() == 0)
+			return true;
+
 		String query = "INSERT INTO carrinhos_itens (carrinho, livro, quantidade) VALUES";
 
 		for (int i = 0; i < carrinho.getNumeroItens(); i++)
+		{
 			query += " (?, ?, ?)";
+
+			if (i < carrinho.getNumeroItens() - 1)
+				query += ",";
+		}
 
 		PreparedStatement ps = connection.prepareStatement(query);
 
 		for (int i = 0, j = 1; i < carrinho.getNumeroItens(); i++)
 		{
+			CarrinhoItem item = carrinho.getItem(i);
+
 			ps.setInt(j++, carrinho.getID());
-			ps.setInt(j++, carrinho.getLivro(i).getID());
-			ps.setInt(j++, carrinho.getQuantidade(i));
+			ps.setInt(j++, item.getLivro().getID());
+			ps.setInt(j++, item.getQuantidade());
 		}
 
-		return ps.executeUpdate() == Conexao.UPDATE_SUCCESSFUL;
+		return ps.executeUpdate() == carrinho.getNumeroItens();
 	}
 
 	private boolean removerItens(Carrinho carrinho) throws SQLException
 	{
-		String query = "DELETE * FROM carrinhos_itens WHERE carrinho = ?";
+		String query = "DELETE FROM carrinhos_itens WHERE carrinho = ?";
 
 		PreparedStatement ps = connection.prepareStatement(query);
 		ps.setInt(1, carrinho.getID());
 
-		return ps.executeUpdate() == Conexao.UPDATE_SUCCESSFUL;
+		return ps.execute();
+	}
+
+	private void carregarItens(Carrinho carrinho) throws SQLException
+	{
+		String query = "SELECT quantidade, livro FROM carrinhos_itens WHERE carrinho = ?";
+
+		PreparedStatement ps = connection.prepareStatement(query);
+		ps.setInt(1, carrinho.getID());
+
+		ResultSet rs = ps.executeQuery();
+
+		while (rs.next())
+		{
+			ControleLivro controleLivro = new ControleLivro();
+			Livro livro = controleLivro.selecionar(rs.getInt("livro"));
+
+			carrinho.adicionar(rs.getInt("quantidade"), livro);
+		}
 	}
 
 	public Carrinho getCarrinho() throws SQLException

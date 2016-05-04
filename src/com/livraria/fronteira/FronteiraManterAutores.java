@@ -478,7 +478,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 
 		try {
 
-			if (controleAutor.excluir(autor.getID()))
+			if (controleAutor.excluir(autor))
 			{
 				model.remover(autor);
 
@@ -555,7 +555,7 @@ public class FronteiraManterAutores extends JPanel implements IFronteira
 
 			Autor autor = model.getLinha(tableConsulta.getSelectedRow());
 
-			if (controleAutor.excluir(autor.getID()))
+			if (controleAutor.excluir(autor))
 			{
 				model.removerLinha(tableConsulta.getSelectedRow());
 				callLimparCampos();

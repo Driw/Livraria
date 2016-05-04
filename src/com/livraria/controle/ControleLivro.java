@@ -112,18 +112,15 @@ public class ControleLivro
 		return ps.executeUpdate() != PreparedStatement.EXECUTE_FAILED;
 	}
 
-	public boolean excluir(int id) throws SQLException
+	public boolean excluir(Livro livro) throws SQLException
 	{
-		Livro livro = new Livro();
-		livro.setID(id);
-
 		removerAutor(livro);
 		removerCategoria(livro);
 
 		String sql = "DELETE FROM livros WHERE id = ?";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
-		ps.setInt(1, id);
+		ps.setInt(1, livro.getID());
 
 		return ps.executeUpdate() != PreparedStatement.EXECUTE_FAILED;
 	}
@@ -361,7 +358,7 @@ public class ControleLivro
 		return livros;
 	}
 
-	public Livro criar(ResultSet rs) throws SQLException
+	private Livro criar(ResultSet rs) throws SQLException
 	{
 		ControleEditora controleEditora = new ControleEditora();
 		Editora editora = controleEditora.selecionar(rs.getInt("editora"));

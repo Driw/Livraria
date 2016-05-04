@@ -683,7 +683,7 @@ public class FronteiraManterLivros extends JPanel implements IFronteira
 
 		try {
 
-			if (controleLivro.excluir(livro.getID()))
+			if (controleLivro.excluir(livro))
 			{
 				model.remover(livro);
 
@@ -815,7 +815,7 @@ public class FronteiraManterLivros extends JPanel implements IFronteira
 
 			Livro livro = model.getLinha(tableConsulta.getSelectedRow());
 
-			if (controleLivro.excluir(livro.getID()))
+			if (controleLivro.excluir(livro))
 			{
 				model.removerLinha(tableConsulta.getSelectedRow());
 				callLimparCampos();

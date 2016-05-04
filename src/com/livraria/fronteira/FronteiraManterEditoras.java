@@ -492,7 +492,7 @@ public class FronteiraManterEditoras extends JPanel implements IFronteira
 
 		try {
 
-			if (controleEditora.excluir(editora.getID()))
+			if (controleEditora.excluir(editora))
 			{
 				model.remover(editora);
 
@@ -570,7 +570,7 @@ public class FronteiraManterEditoras extends JPanel implements IFronteira
 
 			Editora editora = model.getLinha(tableConsulta.getSelectedRow());
 
-			if (controleEditora.excluir(editora.getID()))
+			if (controleEditora.excluir(editora))
 			{
 				model.removerLinha(tableConsulta.getSelectedRow());
 				callLimparCampos();

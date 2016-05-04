@@ -73,12 +73,12 @@ public class ControleAutor
 		return ps.executeUpdate() == Conexao.UPDATE_SUCCESSFUL;
 	}
 
-	public boolean excluir(int id) throws SQLException
+	public boolean excluir(Autor autor) throws SQLException
 	{
 		String sql = "DELETE FROM autores WHERE id = ?";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
-		ps.setInt(1, id);
+		ps.setInt(1, autor.getID());
 
 		return ps.executeUpdate() == Conexao.DELETE_SUCCESSFUL;
 	}
@@ -115,9 +115,9 @@ public class ControleAutor
 		return concluirFiltragem(rs);
 	}
 
-	public List<Autor> filtrarPorLocalMorte(String localMorte) throws SQLException
+	public List<Autor> filtrarPorLocalMorte(String local) throws SQLException
 	{
-		String sql = "SELECT * FROM autores WHERE local_morte LIKE '%" +localMorte+ "%'";
+		String sql = "SELECT * FROM autores WHERE local_morte LIKE '%" +local+ "%'";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
 		ResultSet rs = ps.executeQuery();
@@ -135,7 +135,7 @@ public class ControleAutor
 		return concluirFiltragem(rs);
 	}
 
-	public List<Autor> concluirFiltragem(ResultSet rs) throws SQLException
+	private List<Autor> concluirFiltragem(ResultSet rs) throws SQLException
 	{
 		List<Autor> autores = new ArrayList<Autor>();
 

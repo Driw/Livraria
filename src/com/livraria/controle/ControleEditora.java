@@ -76,12 +76,12 @@ public class ControleEditora
 		return ps.executeUpdate() != PreparedStatement.EXECUTE_FAILED;
 	}
 
-	public boolean excluir(int id) throws SQLException
+	public boolean excluir(Editora editora) throws SQLException
 	{
 		String sql = "DELETE FROM editoras WHERE id = ?";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
-		ps.setInt(1, id);
+		ps.setInt(1, editora.getID());
 
 		return ps.executeUpdate() != PreparedStatement.EXECUTE_FAILED;
 	}
@@ -149,7 +149,7 @@ public class ControleEditora
 		return concluirFiltragem(rs);
 	}
 
-	public List<Editora> concluirFiltragem(ResultSet rs) throws SQLException
+	private List<Editora> concluirFiltragem(ResultSet rs) throws SQLException
 	{
 		List<Editora> editoras = new ArrayList<Editora>();
 

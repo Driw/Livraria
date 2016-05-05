@@ -66,7 +66,11 @@ public class ModelCarrinhoItem extends DefaultTableModel
 				case COLUNA_QUANTIDADE: return item.getQuantidade();
 				case COLUNA_ISBN: return ComponentUtil.isbnFormmat(item.getLivro().getIsbn());
 				case COLUNA_TITULO: return item.getLivro().getTitulo();
-				case COLUNA_EDITORA: return item.getLivro().getEditora().getNome();
+				case COLUNA_EDITORA:
+					if (item.getLivro().getEditora() == null)
+						return "-";
+					return item.getLivro().getEditora().getNome();
+
 				case COLUNA_PRECO: return String.format(Locale.US, "R$ %3.2f", (float) item.getLivro().getPreco());
 				case COLUNA_PRECO_TOTAL: return String.format(Locale.US, "R$ %3.2f", (float) item.getQuantidade() * item.getLivro().getPreco());
 			}

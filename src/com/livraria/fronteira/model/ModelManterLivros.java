@@ -66,7 +66,10 @@ public class ModelManterLivros extends DefaultTableModel
 				case COLUNA_TITULO: return livro.getTitulo();
 				case COLUNA_PRECO: return String.format(Locale.US, "R$ %3.2f", livro.getPreco());
 				case COLUNA_PAGINAS: return livro.getPaginas();
-				case COLUNA_EDITORA: return livro.getEditora().getNome();
+				case COLUNA_EDITORA:
+					if (livro.getEditora() == null)
+						return "-";
+					return livro.getEditora().getNome();
 			}
 
 		return null;

@@ -30,7 +30,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 @SuppressWarnings("serial")
-public class FronteiraCarrinhoDeCompras extends JPanel
+public class FronteiraCarrinhoDeCompras extends JPanel implements CallBack
 {
 	private static final JPanel INSTANCE = new FronteiraCarrinhoDeCompras();
 
@@ -264,5 +264,11 @@ public class FronteiraCarrinhoDeCompras extends JPanel
 	public static JPanel getInstance()
 	{
 		return INSTANCE;
+	}
+
+	@Override
+	public void callBack()
+	{
+		callAtualizar();
 	}
 }

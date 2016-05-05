@@ -230,6 +230,12 @@ public class Fronteira
 
 				prepararContainer(panel);
 				usarContainer(panel);
+
+				if (panel instanceof CallBack)
+				{
+					CallBack callBack = (CallBack) panel;
+					callBack.callBack();
+				}
 			}
 
 			else

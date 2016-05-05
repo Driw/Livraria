@@ -240,7 +240,7 @@ public class FronteiraManterCategorias extends JPanel implements IFronteira
 	@Override
 	public String getTitle()
 	{
-		return "Manter Editoras";
+		return "Manter Categorias";
 	}
 	
 	private Categoria criarCategoria() throws FronteiraException

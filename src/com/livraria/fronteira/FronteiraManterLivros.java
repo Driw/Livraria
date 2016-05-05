@@ -58,7 +58,7 @@ import com.livraria.util.ComponentUtil;
 import com.livraria.util.FronteiraException;
 
 @SuppressWarnings("serial")
-public class FronteiraManterLivros extends JPanel implements IFronteira
+public class FronteiraManterLivros extends JPanel implements IFronteira, CallBack
 {
 	private static final JPanel INSTANCE = new FronteiraManterLivros();
 
@@ -885,6 +885,85 @@ public class FronteiraManterLivros extends JPanel implements IFronteira
 	{
 		if (popupAutores == null)
 		{
+			popupAutores = new PopUpComboBox<ComboBoxAutor>(this);
+			popupAutores.setListener(new PopUpComboBoxListener<ComboBoxAutor>()
+			{
+				@Override
+				public void selecionado(ComboBoxAutor item)
+				{
+					Autor autor = item.getElement();
+					modelAutores.adicionar(autor);
+				}
+			});
+
+			callCarregarAutores();
+		}
+
+		popupAutores.abrir("Selecione um Autor:");
+	}
+
+	private void callRemoverAutor(int linha)
+	{
+		modelAutores.apagar(linha);
+		modelAutores.fireTableDataChanged();
+	}
+
+	private void callAdicionarCategoria()
+	{
+		if (popupCategorias == null)
+		{
+			popupCategorias = new PopUpComboBox<ComboBoxCategoria>(this);
+			popupCategorias.setListener(new PopUpComboBoxListener<ComboBoxCategoria>()
+			{
+				@Override
+				public void selecionado(ComboBoxCategoria item)
+				{
+					Categoria categoria = item.getElement();
+					modelCategorias.adicionar(categoria);
+				}
+			});
+
+			callCarregarCategorias();
+		}
+
+		popupCategorias.abrir("Selecione uma Categoria:");
+	}
+
+	private void callRemoverCategoria(int linha)
+	{
+		modelCategorias.apagar(linha);
+		modelCategorias.fireTableDataChanged();
+	}
+
+	private void callCarregarCategorias()
+	{
+		if (popupCategorias != null)
+		{
+			List<ComboBoxCategoria> itens = new ArrayList<>();
+
+			try {
+
+				ControleCategoria controleCategoria = new ControleCategoria();
+				List<Categoria> categorias = controleCategoria.listar();
+
+				for (Categoria categoria : categorias)
+				{
+					ComboBoxCategoria item = new ComboBoxCategoria(categoria);
+					itens.add(item);
+				}
+
+			} catch (SQLException e) {
+				MessageUtil.showWarning("Chamado de Volta", "Falha ao listar categorias:\n- %s", e.getMessage());
+			}
+
+			popupCategorias.carregar(itens);
+		}
+	}
+
+	private void callCarregarAutores()
+	{
+		if (popupAutores != null)
+		{
 			List<ComboBoxAutor> itens = new ArrayList<>();
 
 			try {
@@ -902,69 +981,8 @@ public class FronteiraManterLivros extends JPanel implements IFronteira
 				MessageUtil.showWarning("Adicionar Autor", "Falha ao listar autores:\n- %s", e.getMessage());
 			}
 
-			popupAutores = new PopUpComboBox<ComboBoxAutor>(this);
 			popupAutores.carregar(itens);
-			popupAutores.setListener(new PopUpComboBoxListener<ComboBoxAutor>()
-			{
-				@Override
-				public void selecionado(ComboBoxAutor item)
-				{
-					Autor autor = item.getElement();
-					modelAutores.adicionar(autor);
-				}
-			});
 		}
-
-		popupAutores.abrir("Selecione um Autor:");
-	}
-
-	private void callRemoverAutor(int linha)
-	{
-		modelAutores.apagar(linha);
-		modelAutores.fireTableDataChanged();
-	}
-
-	private void callAdicionarCategoria()
-	{
-		if (popupCategorias == null)
-		{
-			List<ComboBoxCategoria> itens = new ArrayList<>();
-
-			try {
-
-				ControleCategoria controleCategoria = new ControleCategoria();
-				List<Categoria> categorias = controleCategoria.listar();
-
-				for (Categoria categoria : categorias)
-				{
-					ComboBoxCategoria item = new ComboBoxCategoria(categoria);
-					itens.add(item);
-				}
-
-			} catch (SQLException e) {
-				MessageUtil.showWarning("Adicionar Categoria", "Falha ao listar categorias:\n- %s", e.getMessage());
-			}
-
-			popupCategorias = new PopUpComboBox<ComboBoxCategoria>(this);
-			popupCategorias.carregar(itens);
-			popupCategorias.setListener(new PopUpComboBoxListener<ComboBoxCategoria>()
-			{
-				@Override
-				public void selecionado(ComboBoxCategoria item)
-				{
-					Categoria categoria = item.getElement();
-					modelCategorias.adicionar(categoria);
-				}
-			});
-		}
-
-		popupCategorias.abrir("Selecione uma Categoria:");
-	}
-
-	private void callRemoverCategoria(int linha)
-	{
-		modelCategorias.apagar(linha);
-		modelCategorias.fireTableDataChanged();
 	}
 
 	private void callCarregarEditoras()
@@ -996,5 +1014,13 @@ public class FronteiraManterLivros extends JPanel implements IFronteira
 	public static JPanel getInstance()
 	{
 		return INSTANCE;
+	}
+
+	@Override
+	public void callBack()
+	{
+		callCarregarEditoras();
+		callCarregarCategorias();
+		callCarregarAutores();
 	}
 }

@@ -7,26 +7,25 @@ import java.util.Locale;
 import javax.swing.table.DefaultTableModel;
 
 import com.livraria.entidades.Livro;
-import com.livraria.util.ComponentUtil;
 
 @SuppressWarnings("serial")
 public class ModelPesquisaResultados extends DefaultTableModel
 {
-	private static final int COLUNA_ISBN = 0;
-	private static final int COLUNA_TITULO = 1;
-	private static final int COLUNA_PRECO = 2;
-	private static final int COLUNA_PAGINAS = 3;
-	private static final int COLUNA_EDITORA = 4;
-	private static final int COLUNA_PRIMEIRO_AUTOR = 5;
+	private static final int COLUNA_TITULO = 0;
+	private static final int COLUNA_PRECO = 1;
+	private static final int COLUNA_PAGINAS = 2;
+	private static final int COLUNA_EDITORA = 3;
+	private static final int COLUNA_PRIMEIRO_AUTOR = 4;
+	private static final int COLUNA_CATEGORIAS = 5;
 
 	private static final String COLUNS[] = new String[]
 	{
-		"ISBN", "Nome", "Preço", "Pag.", "Editora", "Autor(es)"
+		"Nome", "Preço", "Pag.", "Editora", "Autor(es)", "Categorias"
 	};
 
 	private static final Class<?> COLUNS_TYPE[] = new Class[]
 	{
-		String.class, String.class, String.class, Integer.class, String.class, String.class
+		String.class, String.class, Integer.class, String.class, String.class, String.class
 	};
 
 	private List<Livro> livros = new ArrayList<Livro>();
@@ -63,7 +62,6 @@ public class ModelPesquisaResultados extends DefaultTableModel
 		if (livro != null)
 			switch (column)
 			{
-				case COLUNA_ISBN: return ComponentUtil.isbnFormmat(livro.getIsbn());
 				case COLUNA_TITULO: return livro.getTitulo();
 				case COLUNA_PRECO: return String.format(Locale.US, "R$ %3.2f", (float) livro.getPreco());
 				case COLUNA_PAGINAS: return livro.getPaginas();
@@ -71,6 +69,7 @@ public class ModelPesquisaResultados extends DefaultTableModel
 					if (livro.getEditora() == null)
 						return "-";
 					return livro.getEditora().getNome();
+
 				case COLUNA_PRIMEIRO_AUTOR:
 					if (livro.getLivroAutores().tamanho() == 0)
 						return "-";
@@ -78,6 +77,14 @@ public class ModelPesquisaResultados extends DefaultTableModel
 						for (int i = 1; i < livro.getLivroAutores().tamanho(); i++)
 							autores += ", " +livro.getLivroAutores().obter(i).getNome();
 					return autores;
+
+				case COLUNA_CATEGORIAS:
+					if (livro.getLivroCategorias().tamanho() == 0)
+						return "-";
+					String categorias = livro.getLivroCategorias().obter(0).getTema();
+						for (int i = 1; i < livro.getLivroCategorias().tamanho(); i++)
+							categorias += ", " +livro.getLivroCategorias().obter(i).getTema();
+					return categorias;
 			}
 
 		return null;

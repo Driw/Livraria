@@ -9,10 +9,13 @@ import org.diverproject.util.MessageUtil;
 import org.diverproject.util.lang.IntUtil;
 
 import com.livraria.controle.ControleCarrinho;
+import com.livraria.controle.ControleCategoria;
 import com.livraria.controle.ControlePesquisa;
 import com.livraria.entidades.Carrinho;
+import com.livraria.entidades.Categoria;
 import com.livraria.entidades.Livro;
 import com.livraria.fronteira.model.ModelPesquisaResultados;
+import com.livraria.fronteira.popup.ComboBoxCategoria;
 
 import javax.swing.UIManager;
 import java.awt.Color;
@@ -45,9 +48,13 @@ public class FronteiraPesquisarLivros extends JPanel
 	private ModelPesquisaResultados model;
 	private ControleCarrinho controleCarrinho;
 
-	private JTextField tfFiltro;
 	private JComboBox<String> cbFiltro;
 	private JTable tableResultados;
+
+	private JComboBox<ComboBoxCategoria> cbCategoriaFiltro;
+	private JPanel panelPesquisaA;
+	private JPanel panelPesquisaB;
+	private JScrollPane spResultados;
 
 	private FronteiraPesquisarLivros()
 	{
@@ -56,36 +63,6 @@ public class FronteiraPesquisarLivros extends JPanel
 		setSize(820, 470);
 		setLayout(null);
 
-		JPanel panelPesquisa = new JPanel();
-		panelPesquisa.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Pesquisar", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panelPesquisa.setBounds(0, 0, 820, 403);
-		panelPesquisa.setLayout(null);
-		add(panelPesquisa);
-
-		JLabel lblFiltrar = new JLabel("Filtrar :");
-		lblFiltrar.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblFiltrar.setBounds(10, 24, 150, 25);
-		panelPesquisa.add(lblFiltrar);
-
-		tfFiltro = new JTextField();
-		tfFiltro.setBounds(170, 24, 480, 25);
-		tfFiltro.addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyReleased(KeyEvent e)
-			{
-				try {
-
-					callFiltrarPesquisa(tfFiltro.getText(), cbFiltro.getSelectedIndex());
-
-				} catch (SQLException exception) {
-					MessageUtil.showException(exception);
-				}
-			}
-		});
-		tfFiltro.setFont(Fronteira.FONT_COMPONENTES);
-		panelPesquisa.add(tfFiltro);
-
 		cbFiltro = new JComboBox<String>();
 		cbFiltro.setBounds(660, 23, 150, 25);
 		cbFiltro.addItem("Título");
@@ -93,35 +70,49 @@ public class FronteiraPesquisarLivros extends JPanel
 		cbFiltro.addItem("Editora");
 		cbFiltro.addItem("Categoria");
 		cbFiltro.setFont(Fronteira.FONT_COMPONENTES);
-		panelPesquisa.add(cbFiltro);
+		cbFiltro.addActionListener(new ActionListener()
+		{
+			private boolean usarCategoria = false;
+
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				boolean old = usarCategoria;
+				usarCategoria = cbFiltro.getSelectedIndex() == 3;
+
+				if (old != usarCategoria)
+					callAlterarFiltro(usarCategoria);
+			}
+		});
 
 		model = new ModelPesquisaResultados();
 
 		tableResultados = new JTable();
 		tableResultados.setModel(model);
 		tableResultados.getColumnModel().getColumn(0).setResizable(false);
-		tableResultados.getColumnModel().getColumn(0).setMinWidth(110);
-		tableResultados.getColumnModel().getColumn(0).setMaxWidth(110);
+		tableResultados.getColumnModel().getColumn(0).setMinWidth(200);
+		tableResultados.getColumnModel().getColumn(0).setMaxWidth(200);
 		tableResultados.getColumnModel().getColumn(1).setResizable(false);
-		tableResultados.getColumnModel().getColumn(1).setMinWidth(200);
-		tableResultados.getColumnModel().getColumn(1).setMaxWidth(200);
+		tableResultados.getColumnModel().getColumn(1).setMinWidth(60);
+		tableResultados.getColumnModel().getColumn(1).setMaxWidth(60);
 		tableResultados.getColumnModel().getColumn(2).setResizable(false);
 		tableResultados.getColumnModel().getColumn(2).setMinWidth(60);
 		tableResultados.getColumnModel().getColumn(2).setMaxWidth(60);
 		tableResultados.getColumnModel().getColumn(3).setResizable(false);
-		tableResultados.getColumnModel().getColumn(3).setMinWidth(60);
-		tableResultados.getColumnModel().getColumn(3).setMaxWidth(60);
+		tableResultados.getColumnModel().getColumn(3).setMinWidth(120);
+		tableResultados.getColumnModel().getColumn(3).setMaxWidth(120);
 		tableResultados.getColumnModel().getColumn(4).setResizable(false);
-		tableResultados.getColumnModel().getColumn(4).setMinWidth(120);
-		tableResultados.getColumnModel().getColumn(4).setMaxWidth(120);
+		tableResultados.getColumnModel().getColumn(4).setMinWidth(185);
+		tableResultados.getColumnModel().getColumn(4).setMaxWidth(185);
 		tableResultados.getColumnModel().getColumn(5).setResizable(false);
-		tableResultados.getColumnModel().getColumn(5).setMinWidth(260);
-		tableResultados.getColumnModel().getColumn(5).setMaxWidth(260);
+		tableResultados.getColumnModel().getColumn(5).setMinWidth(185);
+		tableResultados.getColumnModel().getColumn(5).setMaxWidth(185);
 		tableResultados.setFont(Fronteira.FONT_COMPONENTES);
 
-		JScrollPane spResultados = new JScrollPane(tableResultados);
+		spResultados = new JScrollPane(tableResultados);
 		spResultados.setBounds(10, 59, 800, 333);
-		panelPesquisa.add(spResultados);
+
+		callAlterarFiltro(false);
 
 		JPanel panel = new JPanel();
 		panel.setBorder(new TitledBorder(null, "Ações", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -177,6 +168,119 @@ public class FronteiraPesquisarLivros extends JPanel
 		});
 		btnFinalizarPesquisa.setFont(Fronteira.FONT_COMPONENTES);
 		panel.add(btnFinalizarPesquisa);
+	}
+
+	private void callAlterarFiltro(boolean usarCategoria)
+	{
+		if (usarCategoria)
+		{
+			if (panelPesquisaA != null)
+				remove(panelPesquisaA);
+
+			if (panelPesquisaB == null)
+			{
+				panelPesquisaB = new JPanel();
+				panelPesquisaB.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Pesquisar", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+				panelPesquisaB.setBounds(0, 0, 820, 403);
+				panelPesquisaB.setLayout(null);
+
+				JLabel lblFiltrar = new JLabel("Filtrar :");
+				lblFiltrar.setHorizontalAlignment(SwingConstants.RIGHT);
+				lblFiltrar.setBounds(10, 24, 150, 25);
+				panelPesquisaB.add(lblFiltrar);
+
+				cbCategoriaFiltro = new JComboBox<ComboBoxCategoria>();
+				cbCategoriaFiltro.setBounds(170, 24, 480, 25);
+				cbCategoriaFiltro.setFont(Fronteira.FONT_COMPONENTES);
+				cbCategoriaFiltro.addActionListener(new ActionListener()
+				{
+					@Override
+					public void actionPerformed(ActionEvent e)
+					{
+						Object object = cbCategoriaFiltro.getSelectedItem();
+						ComboBoxCategoria item = (ComboBoxCategoria) object;
+
+						try {
+
+							callFiltrarPesquisa(item.getElement().getTema(), FILTRO_CATEGORIA);
+
+						} catch (SQLException exception) {
+							MessageUtil.showException(exception);
+						}
+					}
+				});
+				panelPesquisaB.add(cbCategoriaFiltro);
+				carregarFiltroCategorias();
+			}
+
+			panelPesquisaB.add(cbFiltro);
+			panelPesquisaB.add(spResultados);
+			add(panelPesquisaB);
+		}
+
+		else
+		{
+			if (panelPesquisaB != null)
+				remove(panelPesquisaB);
+
+			if (panelPesquisaA == null)
+			{
+				panelPesquisaA = new JPanel();
+				panelPesquisaA.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Pesquisar", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+				panelPesquisaA.setBounds(0, 0, 820, 403);
+				panelPesquisaA.setLayout(null);
+
+				JLabel lblFiltrar = new JLabel("Filtrar :");
+				lblFiltrar.setHorizontalAlignment(SwingConstants.RIGHT);
+				lblFiltrar.setBounds(10, 24, 150, 25);
+				panelPesquisaA.add(lblFiltrar);
+
+				JTextField tfFiltro = new JTextField();
+				tfFiltro.setBounds(170, 24, 480, 25);
+				tfFiltro.addKeyListener(new KeyAdapter()
+				{
+					@Override
+					public void keyReleased(KeyEvent e)
+					{
+						try {
+
+							callFiltrarPesquisa(tfFiltro.getText(), cbFiltro.getSelectedIndex());
+
+						} catch (SQLException exception) {
+							MessageUtil.showException(exception);
+						}
+					}
+				});
+				tfFiltro.setFont(Fronteira.FONT_COMPONENTES);
+				panelPesquisaA.add(tfFiltro);
+			}
+
+			panelPesquisaA.add(cbFiltro);
+			panelPesquisaA.add(spResultados);
+			add(panelPesquisaA);
+		}
+
+		repaint();
+	}
+
+	private void carregarFiltroCategorias()
+	{
+		try {
+
+			cbCategoriaFiltro.removeAllItems();
+
+			ControleCategoria controleCategoria = new ControleCategoria();
+			List<Categoria> categorias = controleCategoria.listar();
+
+			for (Categoria categoria : categorias)
+			{
+				ComboBoxCategoria item = new ComboBoxCategoria(categoria);
+				cbCategoriaFiltro.addItem(item);
+			}
+
+		} catch (SQLException e) {
+			MessageUtil.showWarning("Carregar Categorias", "Falha ao listar categorias:\n- %s", e.getMessage());
+		}
 	}
 
 	private void callFiltrarPesquisa(String filtro, int tipoFiltro) throws SQLException
@@ -247,6 +351,12 @@ public class FronteiraPesquisarLivros extends JPanel
 	private void callVisualizarDetalhes()
 	{
 		Livro livro = model.getLinha(tableResultados.getSelectedRow());
+
+		if (livro == null)
+		{
+			MessageUtil.showWarning("Visualizar Detalhes", "Selecione um livro antes.");
+			return;
+		}
 
 		JPanel jPanel = FronteiraVisualizarDetalhes.getInstance();
 		FronteiraVisualizarDetalhes visualizarDetalhes = (FronteiraVisualizarDetalhes) jPanel;

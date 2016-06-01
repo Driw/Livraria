@@ -40,7 +40,7 @@ public class FronteiraManterEditoras extends JPanel implements IFronteira
 	private static final JPanel INSTANCE = new FronteiraManterEditoras();
 
 	private static final int FILTRO_NOME = 0;
-	private static final int FILTRO_ENDERECO = 1;
+	private static final int FILTRO_CNPF = 1;
 	private static final int FILTRO_TELEFONE = 2;
 
 	private ModelManterEditoras model;
@@ -240,7 +240,7 @@ public class FronteiraManterEditoras extends JPanel implements IFronteira
 		cbFiltro = new JComboBox<String>();
 		cbFiltro.setBounds(505, 22, 145, 25);
 		cbFiltro.addItem("Nome");
-		cbFiltro.addItem("Endereço");
+		cbFiltro.addItem("CNPJ");
 		cbFiltro.addItem("Telefone");
 		cbFiltro.setToolTipText("Filtro irá indicar qual a informação da editora que será escolhida como resultado de busca.");
 		panelConsulta.add(cbFiltro);
@@ -520,7 +520,7 @@ public class FronteiraManterEditoras extends JPanel implements IFronteira
 					editoras = controleEditora.filtrarPorNome(filtro);
 					break;
 
-				case FILTRO_ENDERECO:
+				case FILTRO_CNPF:
 					editoras = controleEditora.filtrarPorCNPJ(filtro);
 					break;
 

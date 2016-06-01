@@ -117,11 +117,15 @@ public class PopUpTextArea extends JFrame
 	{
 		if (listener != null)
 			listener.apagar();
+
+		textArea.setText("");
 	}
 
 	private void callSalvar()
 	{
 		if (listener != null)
 			listener.salvar(textArea);
+
+		setVisible(false);
 	}
 }

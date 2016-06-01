@@ -118,8 +118,6 @@ public class ControleEditora
 		String sql = "SELECT * FROM editoras WHERE cnpj LIKE '%" +cnpj+ "%'";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
-		ps.setString(1, cnpj);
-
 		ResultSet rs = ps.executeQuery();
 
 		return concluirFiltragem(rs);
@@ -127,11 +125,9 @@ public class ControleEditora
 
 	public List<Editora> filtrarPorNome(String nome) throws SQLException
 	{
-		String sql = "SELECT * FROM editoras WHERE nome = '%" +nome+ "%'";
+		String sql = "SELECT * FROM editoras WHERE nome LIKE '%" +nome+ "%'";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
-		ps.setString(1, nome);
-
 		ResultSet rs = ps.executeQuery();
 
 		return concluirFiltragem(rs);
@@ -142,8 +138,6 @@ public class ControleEditora
 		String sql = "SELECT * FROM editoras WHERE telefone LIKE '%" +telefone+ "%'";
 
 		PreparedStatement ps = connection.prepareStatement(sql);
-		ps.setString(1, telefone);
-
 		ResultSet rs = ps.executeQuery();
 
 		return concluirFiltragem(rs);

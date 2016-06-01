@@ -9,7 +9,7 @@ public class Principal
 {
 	public static void main(String[] args)
 	{
-		SystemUtil.setWindowInterface();
+		SystemUtil.setWindowsInterface();
 
 		Fronteira fronteira = Fronteira.getInstancia();
 		fronteira.setFronteira(FronteiraPesquisarLivros.class);
